@@ -125,7 +125,7 @@ export default function Index() {
             
             <TouchableOpacity
               style={styles.userTypeCard}
-              onPress={() => setSelectedUserType('medecin')}
+              onPress={() => router.push('/doctor-login')}
             >
               <View style={styles.userTypeIcon}>
                 <Ionicons name="medical" size={30} color="#2E8B57" />

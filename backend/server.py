@@ -297,7 +297,12 @@ async def get_doctor_appointments(doctor_id: str, status: Optional[str] = None, 
     return enriched_appointments
 
 @api_router.put("/doctors/{doctor_id}/appointments/{appointment_id}/status")
-async def update_appointment_status(doctor_id: str, appointment_id: str, status: AppointmentStatus):
+async def update_appointment_status(doctor_id: str, appointment_id: str, request: dict):
+    # Récupérer le statut depuis le body de la requête
+    status = request.get('status')
+    if not status:
+        raise HTTPException(status_code=400, detail="Status is required")
+    
     # Vérifier que le rendez-vous appartient au médecin
     appointment = await db.appointments.find_one({
         "id": appointment_id,

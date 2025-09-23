@@ -240,10 +240,7 @@ export default function DoctorDashboard() {
 
           <TouchableOpacity
             style={styles.actionCard}
-            onPress={() => router.push({
-              pathname: '/doctor-patients',
-              params: { doctorId: doctorId as string }
-            })}
+            onPress={() => router.push(`/doctor-patients?doctorId=${doctorId}`)}
           >
             <View style={styles.actionIcon}>
               <Ionicons name="people" size={24} color="#2E8B57" />

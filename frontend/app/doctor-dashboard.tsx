@@ -71,24 +71,15 @@ export default function DoctorDashboard() {
   };
 
   const navigateToAppointments = () => {
-    router.push({
-      pathname: '/doctor-appointments',
-      params: { doctorId: doctorId as string }
-    });
+    router.push(`/doctor-appointments?doctorId=${doctorId}`);
   };
 
   const navigateToProfile = () => {
-    router.push({
-      pathname: '/doctor-profile',
-      params: { doctorId: doctorId as string }
-    });
+    router.push(`/doctor-profile?doctorId=${doctorId}`);
   };
 
   const navigateToAvailability = () => {
-    router.push({
-      pathname: '/doctor-availability',
-      params: { doctorId: doctorId as string }
-    });
+    router.push(`/doctor-availability?doctorId=${doctorId}`);
   };
 
   if (loading) {

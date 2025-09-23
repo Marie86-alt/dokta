@@ -10,6 +10,7 @@ import {
   Alert
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 const EXPO_PUBLIC_BACKEND_URL = process.env.EXPO_PUBLIC_BACKEND_URL;
 
@@ -68,8 +69,21 @@ export default function Index() {
     fetchDoctorsBySpecialty(specialty);
   };
 
+  const handleDoctorSelect = (doctor: Doctor) => {
+    router.push({
+      pathname: `/booking/${doctor.id}`,
+      params: { doctorId: doctor.id }
+    });
+  };
+
   const formatPrice = (price: number) => {
     return `${price.toLocaleString()} FCFA`;
+  };
+
+  const resetNavigation = () => {
+    setSelectedUserType(null);
+    setSelectedSpecialty(null);
+    setDoctors([]);
   };
 
   if (!selectedUserType) {
@@ -137,7 +151,7 @@ export default function Index() {
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.backButton}
-            onPress={() => setSelectedUserType(null)}
+            onPress={() => resetNavigation()}
           >
             <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
           </TouchableOpacity>
@@ -196,16 +210,7 @@ export default function Index() {
                 <TouchableOpacity
                   key={doctor.id}
                   style={styles.doctorCard}
-                  onPress={() => {
-                    Alert.alert(
-                      'Réserver un rendez-vous',
-                      `Voulez-vous réserver avec ${doctor.nom} ?\nTarif: ${formatPrice(doctor.tarif)}`,
-                      [
-                        { text: 'Annuler', style: 'cancel' },
-                        { text: 'Réserver', onPress: () => console.log('Réservation avec:', doctor.nom) }
-                      ]
-                    );
-                  }}
+                  onPress={() => handleDoctorSelect(doctor)}
                 >
                   <View style={styles.doctorAvatar}>
                     <Ionicons name="person-circle" size={50} color="#2E8B57" />
@@ -235,7 +240,7 @@ export default function Index() {
       <View style={styles.header}>
         <TouchableOpacity
           style={styles.backButton}
-          onPress={() => setSelectedUserType(null)}
+          onPress={() => resetNavigation()}
         >
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>

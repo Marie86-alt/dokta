@@ -228,6 +228,184 @@ async def confirm_appointment(appointment_id: str):
     
     return {"message": "Rendez-vous confirmé avec succès"}
 
+# Doctor Dashboard Routes
+@api_router.get("/doctors/{doctor_id}/dashboard")
+async def get_doctor_dashboard(doctor_id: str):
+    # Vérifier si le médecin existe
+    doctor = await db.doctors.find_one({"id": doctor_id})
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Médecin non trouvé")
+    
+    # Statistiques des rendez-vous
+    today = datetime.now().strftime('%Y-%m-%d')
+    
+    total_appointments = await db.appointments.count_documents({"doctor_id": doctor_id})
+    today_appointments = await db.appointments.count_documents({
+        "doctor_id": doctor_id,
+        "date": today,
+        "status": {"$ne": AppointmentStatus.CANCELLED}
+    })
+    confirmed_appointments = await db.appointments.count_documents({
+        "doctor_id": doctor_id,
+        "status": AppointmentStatus.CONFIRMED
+    })
+    pending_appointments = await db.appointments.count_documents({
+        "doctor_id": doctor_id,
+        "status": AppointmentStatus.PENDING
+    })
+    
+    # Revenus du mois
+    current_month = datetime.now().strftime('%Y-%m')
+    monthly_appointments = await db.appointments.find({
+        "doctor_id": doctor_id,
+        "status": AppointmentStatus.CONFIRMED,
+        "date": {"$regex": f"^{current_month}"}
+    }).to_list(1000)
+    
+    monthly_revenue = sum(appt.get("tarif", 0) for appt in monthly_appointments)
+    
+    return {
+        "doctor": Doctor(**doctor),
+        "stats": {
+            "total_appointments": total_appointments,
+            "today_appointments": today_appointments,
+            "confirmed_appointments": confirmed_appointments,
+            "pending_appointments": pending_appointments,
+            "monthly_revenue": monthly_revenue,
+            "monthly_appointments": len(monthly_appointments)
+        }
+    }
+
+@api_router.get("/doctors/{doctor_id}/appointments", response_model=List[dict])
+async def get_doctor_appointments(doctor_id: str, status: Optional[str] = None, date: Optional[str] = None):
+    query = {"doctor_id": doctor_id}
+    if status:
+        query["status"] = status
+    if date:
+        query["date"] = date
+    
+    appointments = await db.appointments.find(query).sort("date", 1).to_list(1000)
+    
+    # Enrichir avec les données patient
+    enriched_appointments = []
+    for appt in appointments:
+        patient = await db.users.find_one({"id": appt["patient_id"]})
+        appt_dict = Appointment(**appt).dict()
+        appt_dict["patient"] = User(**patient).dict() if patient else None
+        enriched_appointments.append(appt_dict)
+    
+    return enriched_appointments
+
+@api_router.put("/doctors/{doctor_id}/appointments/{appointment_id}/status")
+async def update_appointment_status(doctor_id: str, appointment_id: str, status: AppointmentStatus):
+    # Vérifier que le rendez-vous appartient au médecin
+    appointment = await db.appointments.find_one({
+        "id": appointment_id,
+        "doctor_id": doctor_id
+    })
+    
+    if not appointment:
+        raise HTTPException(status_code=404, detail="Rendez-vous non trouvé")
+    
+    result = await db.appointments.update_one(
+        {"id": appointment_id},
+        {"$set": {"status": status}}
+    )
+    
+    return {"message": f"Statut mis à jour: {status}"}
+
+@api_router.put("/doctors/{doctor_id}/profile")
+async def update_doctor_profile(doctor_id: str, updates: dict):
+    allowed_fields = ["nom", "telephone", "experience", "tarif", "disponible"]
+    update_data = {k: v for k, v in updates.items() if k in allowed_fields}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Aucune donnée valide à mettre à jour")
+    
+    result = await db.doctors.update_one(
+        {"id": doctor_id},
+        {"$set": update_data}
+    )
+    
+    if result.modified_count == 0:
+        raise HTTPException(status_code=404, detail="Médecin non trouvé")
+    
+    # Retourner le profil mis à jour
+    updated_doctor = await db.doctors.find_one({"id": doctor_id})
+    return Doctor(**updated_doctor)
+
+# Availability Management
+class AvailabilitySlot(BaseModel):
+    date: str
+    heure: str
+    disponible: bool
+
+@api_router.put("/doctors/{doctor_id}/availability")
+async def update_doctor_availability(doctor_id: str, slots: List[AvailabilitySlot]):
+    doctor = await db.doctors.find_one({"id": doctor_id})
+    if not doctor:
+        raise HTTPException(status_code=404, detail="Médecin non trouvé")
+    
+    # Pour chaque créneau, créer ou supprimer un rendez-vous "bloqué"
+    for slot in slots:
+        if not slot.disponible:
+            # Créer un rendez-vous de blocage
+            existing = await db.appointments.find_one({
+                "doctor_id": doctor_id,
+                "date": slot.date,
+                "heure": slot.heure,
+                "status": "blocked"
+            })
+            
+            if not existing:
+                block_appointment = {
+                    "id": str(uuid.uuid4()),
+                    "patient_id": "blocked",
+                    "doctor_id": doctor_id,
+                    "date": slot.date,
+                    "heure": slot.heure,
+                    "status": "blocked",
+                    "tarif": 0,
+                    "created_at": datetime.utcnow()
+                }
+                await db.appointments.insert_one(block_appointment)
+        else:
+            # Supprimer le blocage s'il existe
+            await db.appointments.delete_many({
+                "doctor_id": doctor_id,
+                "date": slot.date,
+                "heure": slot.heure,
+                "status": "blocked"
+            })
+    
+    return {"message": "Disponibilités mises à jour avec succès"}
+
+@api_router.get("/doctors/{doctor_id}/patients")
+async def get_doctor_patients(doctor_id: str):
+    # Récupérer tous les patients qui ont eu des rendez-vous avec ce médecin
+    appointments = await db.appointments.find({
+        "doctor_id": doctor_id,
+        "status": {"$in": [AppointmentStatus.CONFIRMED, AppointmentStatus.COMPLETED]}
+    }).to_list(1000)
+    
+    patient_ids = list(set(appt["patient_id"] for appt in appointments))
+    patients = []
+    
+    for patient_id in patient_ids:
+        patient = await db.users.find_one({"id": patient_id})
+        if patient:
+            # Compter les rendez-vous
+            appt_count = len([appt for appt in appointments if appt["patient_id"] == patient_id])
+            patient_data = User(**patient).dict()
+            patient_data["appointment_count"] = appt_count
+            patient_data["last_appointment"] = max(
+                (appt["date"] for appt in appointments if appt["patient_id"] == patient_id),
+                default=None
+            )
+            patients.append(patient_data)
+    
+    return sorted(patients, key=lambda p: p.get("last_appointment", ""), reverse=True)
+
 # Include the router in the main app
 app.include_router(api_router)
 

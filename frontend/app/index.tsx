@@ -106,18 +106,14 @@ export default function Index() {
 
   const renderAccueilTab = () => (
     <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
-      {/* Hero Section Style Doctolib */}
-      <View style={styles.heroSection}>
-        <Text style={styles.heroTitle}>Trouvez et prenez rendez-vous avec un professionnel de santé</Text>
-        <Text style={styles.heroSubtitle}>Consultez un médecin en ligne ou prenez rendez-vous</Text>
-        
-        {/* Search Section Style Doctolib */}
+      {/* Search Section */}
+      <View style={styles.searchSection}>
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#666" />
             <TextInput
               style={styles.searchInput}
-              placeholder="Spécialité, médecin, établissement..."
+              placeholder="Rechercher un médecin, une spécialité..."
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -478,27 +474,6 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
-  // Hero Section Style Doctolib
-  heroSection: {
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 20,
-    paddingVertical: 32,
-    marginBottom: 8,
-  },
-  heroTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#333',
-    textAlign: 'center',
-    marginBottom: 8,
-    lineHeight: 32,
-  },
-  heroSubtitle: {
-    fontSize: 16,
-    color: '#666',
-    textAlign: 'center',
-    marginBottom: 24,
-  },
   searchSection: {
     backgroundColor: '#2E8B57',
     paddingHorizontal: 16,
@@ -510,17 +485,15 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
     paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    paddingVertical: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   searchInput: {
     flex: 1,
@@ -761,59 +734,5 @@ const styles = StyleSheet.create({
   },
   tabTextActive: {
     color: '#2E8B57',
-  },
-  // Styles pour l'onglet Compte
-  accountActions: {
-    paddingHorizontal: 16,
-    marginTop: 24,
-  },
-  loginButton: {
-    backgroundColor: '#2E8B57',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    gap: 8,
-  },
-  loginButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#FFFFFF',
-  },
-  registerButton: {
-    backgroundColor: '#FFFFFF',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#2E8B57',
-    marginBottom: 24,
-    gap: 8,
-  },
-  registerButtonText: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#2E8B57',
-  },
-  // Bouton flottant médecin
-  doctorFloatingButton: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#2E8B57',
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
-    elevation: 8,
   },
 });

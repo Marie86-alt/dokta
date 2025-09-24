@@ -294,32 +294,94 @@ export default function Index() {
         {tabName === 'rendez-vous' && 'Mes Rendez-vous'}
         {tabName === 'documents' && 'Mes Documents'}
         {tabName === 'messages' && 'Messages'}
-        {tabName === 'compte' && 'Mon Compte'}
+        {tabName === 'compte' && (user ? `Profil de ${user.nom}` : 'Mon Compte')}
       </Text>
       <Text style={styles.comingSoonText}>
         {tabName === 'compte' 
-          ? 'Connectez-vous pour accéder à votre compte'
+          ? (user ? 'Gérez votre profil et vos informations' : 'Connectez-vous pour accéder à votre compte')
           : 'Cette section sera bientôt disponible'
         }
       </Text>
       
       {tabName === 'compte' && (
         <View style={styles.accountActions}>
-          <TouchableOpacity 
-            style={styles.loginButton}
-            onPress={() => Alert.alert('Connexion Patient', 'Fonctionnalité bientôt disponible')}
-          >
-            <Ionicons name="person" size={20} color="#FFFFFF" />
-            <Text style={styles.loginButtonText}>Se connecter</Text>
-          </TouchableOpacity>
-          
-          <TouchableOpacity 
-            style={styles.registerButton}
-            onPress={() => Alert.alert('Inscription Patient', 'Fonctionnalité bientôt disponible')}
-          >
-            <Ionicons name="person-add" size={20} color="#2E8B57" />
-            <Text style={styles.registerButtonText}>Créer un compte</Text>
-          </TouchableOpacity>
+          {user ? (
+            // Utilisateur connecté
+            <View style={styles.userProfile}>
+              <View style={styles.profileInfo}>
+                <Text style={styles.profileName}>{user.nom}</Text>
+                <Text style={styles.profilePhone}>{user.telephone}</Text>
+                <Text style={styles.profileType}>
+                  {user.type === 'patient' ? `Patient • ${user.age} ans • ${user.ville}` : 
+                   `Médecin ${user.specialite} • ${user.experience}`}
+                </Text>
+              </View>
+
+              <TouchableOpacity 
+                style={styles.profileButton}
+                onPress={() => Alert.alert('Profil', 'Modification du profil bientôt disponible')}
+              >
+                <Ionicons name="create-outline" size={20} color="#2E8B57" />
+                <Text style={styles.profileButtonText}>Modifier le profil</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity 
+                style={styles.logoutButton}
+                onPress={() => {
+                  Alert.alert(
+                    'Déconnexion',
+                    'Êtes-vous sûr de vouloir vous déconnecter ?',
+                    [
+                      { text: 'Annuler', style: 'cancel' },
+                      { text: 'Déconnexion', onPress: logout }
+                    ]
+                  );
+                }}
+              >
+                <Ionicons name="log-out-outline" size={20} color="#E74C3C" />
+                <Text style={styles.logoutButtonText}>Se déconnecter</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            // Utilisateur non connecté
+            <>
+              <TouchableOpacity 
+                style={styles.loginButton}
+                onPress={() => router.push('/login')}
+              >
+                <Ionicons name="person" size={20} color="#FFFFFF" />
+                <Text style={styles.loginButtonText}>Se connecter</Text>
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={styles.registerButton}
+                onPress={() => router.push('/register')}
+              >
+                <Ionicons name="person-add" size={20} color="#2E8B57" />
+                <Text style={styles.registerButtonText}>Créer un compte</Text>
+              </TouchableOpacity>
+
+              <View style={styles.accountFeatures}>
+                <Text style={styles.featuresTitle}>Avec votre compte DOKTA :</Text>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+                  <Text style={styles.featureText}>Prenez rendez-vous en ligne</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+                  <Text style={styles.featureText}>Consultez vos documents médicaux</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+                  <Text style={styles.featureText}>Gérez vos rendez-vous</Text>
+                </View>
+                <View style={styles.featureItem}>
+                  <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+                  <Text style={styles.featureText}>Recevez des rappels</Text>
+                </View>
+              </View>
+            </>
+          )}
         </View>
       )}
     </View>

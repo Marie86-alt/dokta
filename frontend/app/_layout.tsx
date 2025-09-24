@@ -9,6 +9,9 @@ export default function RootLayout() {
         <Stack.Screen name="login" options={{ headerShown: false }} />
         <Stack.Screen name="register" options={{ headerShown: false }} />
         <Stack.Screen name="consultation-choice" options={{ headerShown: false }} />
+        <Stack.Screen name="doctor-profile/[doctorId]" options={{ headerShown: false }} />
+        <Stack.Screen name="patient-selection" options={{ headerShown: false }} />
+        <Stack.Screen name="booking/calendar" options={{ headerShown: false }} />
         <Stack.Screen 
           name="booking/[doctorId]" 
           options={{ 

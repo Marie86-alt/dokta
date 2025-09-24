@@ -304,7 +304,7 @@ export default function Index() {
         <View style={styles.accountActions}>
           <TouchableOpacity 
             style={styles.loginButton}
-            onPress={() => Alert.alert('Connexion Patient', 'Fonctionnalité bientôt disponible')}
+            onPress={() => Alert.alert('Connexion Patient', 'Connectez-vous avec votre numéro de téléphone et mot de passe')}
           >
             <Ionicons name="person" size={20} color="#FFFFFF" />
             <Text style={styles.loginButtonText}>Se connecter</Text>
@@ -312,11 +312,31 @@ export default function Index() {
           
           <TouchableOpacity 
             style={styles.registerButton}
-            onPress={() => Alert.alert('Inscription Patient', 'Fonctionnalité bientôt disponible')}
+            onPress={() => Alert.alert('Inscription Patient', 'Créez votre compte patient avec votre numéro camerounais (+237)')}
           >
             <Ionicons name="person-add" size={20} color="#2E8B57" />
             <Text style={styles.registerButtonText}>Créer un compte</Text>
           </TouchableOpacity>
+
+          <View style={styles.accountFeatures}>
+            <Text style={styles.featuresTitle}>Avec votre compte DOKTA :</Text>
+            <View style={styles.featureItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Text style={styles.featureText}>Prenez rendez-vous en ligne</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Text style={styles.featureText}>Consultez vos documents médicaux</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Text style={styles.featureText}>Gérez vos rendez-vous</Text>
+            </View>
+            <View style={styles.featureItem}>
+              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
+              <Text style={styles.featureText}>Recevez des rappels</Text>
+            </View>
+          </View>
         </View>
       )}
     </View>

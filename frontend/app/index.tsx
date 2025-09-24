@@ -106,15 +106,14 @@ export default function Index() {
 
   const renderAccueilTab = () => (
     <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
-      {/* Main Search Section - Style Doctolib amélioré */}
-      <View style={styles.mainSearchSection}>
-        <Text style={styles.searchTitle}>Trouvez et prenez rendez-vous avec un professionnel de santé</Text>
+      {/* Search Section */}
+      <View style={styles.searchSection}>
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#666" />
             <TextInput
               style={styles.searchInput}
-              placeholder="Spécialité, médecin, établissement..."
+              placeholder="Rechercher un médecin, une spécialité..."
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -304,7 +303,7 @@ export default function Index() {
         <View style={styles.accountActions}>
           <TouchableOpacity 
             style={styles.loginButton}
-            onPress={() => Alert.alert('Connexion Patient', 'Connectez-vous avec votre numéro de téléphone et mot de passe')}
+            onPress={() => Alert.alert('Connexion Patient', 'Fonctionnalité bientôt disponible')}
           >
             <Ionicons name="person" size={20} color="#FFFFFF" />
             <Text style={styles.loginButtonText}>Se connecter</Text>
@@ -312,31 +311,11 @@ export default function Index() {
           
           <TouchableOpacity 
             style={styles.registerButton}
-            onPress={() => Alert.alert('Inscription Patient', 'Créez votre compte patient avec votre numéro camerounais (+237)')}
+            onPress={() => Alert.alert('Inscription Patient', 'Fonctionnalité bientôt disponible')}
           >
             <Ionicons name="person-add" size={20} color="#2E8B57" />
             <Text style={styles.registerButtonText}>Créer un compte</Text>
           </TouchableOpacity>
-
-          <View style={styles.accountFeatures}>
-            <Text style={styles.featuresTitle}>Avec votre compte DOKTA :</Text>
-            <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.featureText}>Prenez rendez-vous en ligne</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.featureText}>Consultez vos documents médicaux</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.featureText}>Gérez vos rendez-vous</Text>
-            </View>
-            <View style={styles.featureItem}>
-              <Ionicons name="checkmark-circle" size={16} color="#27AE60" />
-              <Text style={styles.featureText}>Recevez des rappels</Text>
-            </View>
-          </View>
         </View>
       )}
     </View>
@@ -350,13 +329,10 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.appTitle}>DOKTA</Text>
-          <Text style={styles.appSubtitle}>Votre santé en quelques clics - Cameroun</Text>
+          <Text style={styles.appSubtitle}>Santé digitale - Cameroun</Text>
         </View>
-        <TouchableOpacity 
-          style={styles.headerButton}
-          onPress={() => router.push('/doctor-login')}
-        >
-          <Ionicons name="medical" size={24} color="#FFFFFF" />
+        <TouchableOpacity style={styles.headerButton}>
+          <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 
@@ -498,20 +474,10 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
-  // Section de recherche style Doctolib amélioré
-  mainSearchSection: {
-    backgroundColor: '#FFFFFF',
+  searchSection: {
+    backgroundColor: '#2E8B57',
     paddingHorizontal: 16,
-    paddingVertical: 24,
-    marginBottom: 8,
-  },
-  searchTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-    textAlign: 'center',
-    lineHeight: 26,
+    paddingBottom: 20,
   },
   searchContainer: {
     position: 'relative',
@@ -519,12 +485,10 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F8F9FA',
-    borderRadius: 12,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 25,
     paddingHorizontal: 16,
-    paddingVertical: 16,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
+    paddingVertical: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -539,7 +503,7 @@ const styles = StyleSheet.create({
   },
   searchResults: {
     position: 'absolute',
-    top: 65,
+    top: 50,
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
@@ -806,29 +770,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: '600',
     color: '#2E8B57',
-  },
-  accountFeatures: {
-    backgroundColor: '#F8F9FA',
-    padding: 20,
-    borderRadius: 12,
-    marginTop: 16,
-  },
-  featuresTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 16,
-  },
-  featureItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-    gap: 8,
-  },
-  featureText: {
-    fontSize: 14,
-    color: '#666',
-    flex: 1,
   },
   doctorFloatingButton: {
     position: 'absolute',

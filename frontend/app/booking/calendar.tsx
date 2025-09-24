@@ -72,13 +72,25 @@ export default function BookingCalendarScreen() {
   const loadAvailableSlots = async (date: string) => {
     setLoading(true);
     try {
-      // Simuler le chargement des créneaux disponibles
-      // En réalité, on appellerait l'API avec doctorId et date
-      const slots = generateTimeSlots(date);
-      setAvailableSlots(slots);
+      // Appel API réel pour charger les créneaux disponibles
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/doctors/${doctorId}/available-slots?date=${date}`);
+      if (response.ok) {
+        const slotsData = await response.json();
+        // Transformer les données de l'API en format attendu par l'UI
+        const formattedSlots: TimeSlot[] = slotsData.map((slot: any) => ({
+          time: slot.heure,
+          available: slot.disponible
+        }));
+        setAvailableSlots(formattedSlots);
+      } else {
+        throw new Error('Impossible de charger les créneaux');
+      }
     } catch (error) {
       console.error('Erreur chargement créneaux:', error);
-      Alert.alert('Erreur', 'Impossible de charger les créneaux disponibles');
+      // Fallback vers des créneaux simulés en cas d'erreur
+      const fallbackSlots = generateTimeSlots(date);
+      setAvailableSlots(fallbackSlots);
+      Alert.alert('Info', 'Chargement des créneaux par défaut');
     } finally {
       setLoading(false);
     }

@@ -155,6 +155,8 @@ export default function BookingCalendarScreen() {
     }
 
     try {
+      setLoading(true);
+      
       const bookingData = {
         doctor_id: doctorId,
         patient_name: patientName,
@@ -166,7 +168,9 @@ export default function BookingCalendarScreen() {
         user_id: user?.id,
       };
 
-      const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/appointments`, {
+      console.log('Données de réservation:', bookingData);
+
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/appointments-simple`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -176,26 +180,42 @@ export default function BookingCalendarScreen() {
 
       if (response.ok) {
         const appointment = await response.json();
+        console.log('Rendez-vous créé:', appointment);
         
-        // Rediriger vers la page de paiement
-        router.push({
-          pathname: '/payment',
-          params: {
-            appointmentId: appointment.id,
-            doctorName: doctorName as string,
-            patientName: patientName as string,
-            date: selectedDate,
-            time: selectedTime,
-            consultationType: consultationType as string,
-            price: price as string,
-          }
-        });
+        Alert.alert(
+          'Rendez-vous confirmé !', 
+          'Votre rendez-vous a été créé avec succès.',
+          [
+            {
+              text: 'OK',
+              onPress: () => {
+                // Rediriger vers la confirmation
+                router.push({
+                  pathname: '/booking-confirmation',
+                  params: {
+                    appointmentId: appointment.id,
+                    doctorName: doctorName as string,
+                    patientName: patientName as string,
+                    date: selectedDate,
+                    time: selectedTime,
+                    consultationType: consultationType as string,
+                    price: price as string,
+                  }
+                });
+              }
+            }
+          ]
+        );
       } else {
+        const errorData = await response.text();
+        console.error('Erreur API:', errorData);
         throw new Error('Erreur lors de la réservation');
       }
     } catch (error) {
       console.error('Erreur réservation:', error);
-      Alert.alert('Erreur', 'Impossible de confirmer le rendez-vous');
+      Alert.alert('Erreur', 'Impossible de confirmer le rendez-vous. Veuillez réessayer.');
+    } finally {
+      setLoading(false);
     }
   };
 

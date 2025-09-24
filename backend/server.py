@@ -729,13 +729,32 @@ async def create_appointment_simple(request: Request):
         appointment_data = await request.json()
         print(f"Données reçues: {appointment_data}")
         
+        # Vérifier que le créneau n'est pas déjà pris
+        existing = await db.appointments.find_one({
+            "doctor_id": appointment_data.get("doctor_id"),
+            "date": appointment_data.get("date"),
+            "$or": [
+                {"heure": appointment_data.get("time")},
+                {"time": appointment_data.get("time")}
+            ],
+            "status": {"$ne": "cancelled"}
+        })
+        
+        if existing:
+            raise HTTPException(status_code=409, detail="Ce créneau est déjà réservé")
+        
         # Générer un ID unique pour le rendez-vous
         appointment_id = str(uuid.uuid4())
+        
+        # Normaliser les données - utiliser 'heure' pour la cohérence
+        normalized_data = appointment_data.copy()
+        if "time" in normalized_data:
+            normalized_data["heure"] = normalized_data.pop("time")
         
         # Créer l'objet rendez-vous
         appointment = {
             "id": appointment_id,
-            **appointment_data,
+            **normalized_data,
             "status": "confirmed",
             "created_at": datetime.utcnow().isoformat(),
             "payment_status": "pending"
@@ -746,6 +765,8 @@ async def create_appointment_simple(request: Request):
         
         return {"id": appointment_id, "status": "confirmed"}
         
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"Erreur création rendez-vous: {e}")
         raise HTTPException(status_code=500, detail=str(e))

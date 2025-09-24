@@ -98,7 +98,8 @@ export default function Index() {
     setShowResults(false);
     
     if (result.type === 'doctor') {
-      router.push(`/booking/${result.id}`);
+      // Rediriger vers la page détaillée du médecin
+      router.push(`/doctor-profile/${result.id}`);
     } else if (result.type === 'specialty') {
       router.push(`/doctor-search?specialty=${encodeURIComponent(result.title)}`);
     }

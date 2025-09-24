@@ -688,10 +688,10 @@ const styles = StyleSheet.create({
   doctorCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: 12,
+    padding: 8,
     backgroundColor: '#F8F9FA',
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 8,
   },
   doctorAvatar: {
     marginRight: 12,

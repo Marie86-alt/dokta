@@ -483,7 +483,11 @@ class MediBookTester:
             self.test_create_appointment,
             self.test_double_booking_prevention,
             self.test_confirm_appointment,
-            self.test_slot_unavailable_after_booking
+            self.test_slot_unavailable_after_booking,
+            self.test_global_search,
+            self.test_doctor_dashboard,
+            self.test_doctor_appointments,
+            self.test_error_handling
         ]
         
         for test in tests:

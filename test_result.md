@@ -143,6 +143,33 @@ backend:
       - working: true
         agent: "testing"
         comment: "Tests complets réussis (10/10): API Root, GET Specialties (8 spécialités), GET Doctors (5 médecins), GET Doctors by Specialty, POST Create Patient (données camerounaises), GET Available Slots (13 créneaux), POST Create Appointment, Double Booking Prevention, PUT Confirm Appointment, Slot Unavailable After Booking. Toutes les APIs critiques fonctionnent parfaitement avec données réalistes camerounaises."
+      - working: true
+        agent: "testing"
+        comment: "Tests étendus réussis (16/16): Toutes les APIs de base + nouvelles fonctionnalités (recherche globale, tableau de bord médecin, gestion d'erreurs) fonctionnent parfaitement. Aucune erreur 422/500 détectée. Données camerounaises testées avec succès."
+
+  - task: "API recherche globale"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "API de recherche globale testée avec succès: recherche médecins (1 résultat pour 'Marie'), recherche spécialités (1 résultat pour 'Cardio'). Retourne des résultats structurés avec type, titre, sous-titre et métadonnées."
+
+  - task: "API tableau de bord médecin"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "API tableau de bord médecin testée avec succès: statistiques complètes (total_appointments, today_appointments, confirmed_appointments, pending_appointments), données médecin incluses. API rendez-vous médecin avec données patient enrichies fonctionne parfaitement."
 
 frontend:
   - task: "Interface accueil Patient/Médecin"

@@ -106,14 +106,15 @@ export default function Index() {
 
   const renderAccueilTab = () => (
     <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
-      {/* Search Section */}
-      <View style={styles.searchSection}>
+      {/* Main Search Section - Style Doctolib amélioré */}
+      <View style={styles.mainSearchSection}>
+        <Text style={styles.searchTitle}>Trouvez et prenez rendez-vous avec un professionnel de santé</Text>
         <View style={styles.searchContainer}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#666" />
             <TextInput
               style={styles.searchInput}
-              placeholder="Rechercher un médecin, une spécialité..."
+              placeholder="Spécialité, médecin, établissement..."
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -454,7 +455,13 @@ export default function Index() {
         </TouchableOpacity>
       </View>
 
-
+      {/* Floating Doctor Button */}
+      <TouchableOpacity
+        style={styles.doctorFloatingButton}
+        onPress={() => router.push('/doctor-login')}
+      >
+        <Ionicons name="medical" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }
@@ -491,11 +498,7 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
-  searchSection: {
-    backgroundColor: '#2E8B57',
-    paddingHorizontal: 16,
-    paddingBottom: 20,
-  },
+  // Section de recherche style Doctolib amélioré
   mainSearchSection: {
     backgroundColor: '#FFFFFF',
     paddingHorizontal: 16,
@@ -534,13 +537,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
-  loadingText: {
-    fontSize: 14,
-    color: '#666',
-  },
   searchResults: {
     position: 'absolute',
-    top: 50,
+    top: 65,
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',

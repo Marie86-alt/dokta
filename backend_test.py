@@ -10,7 +10,7 @@ import os
 from datetime import datetime
 
 # Configuration des URLs
-BACKEND_URL = "https://healthbookcm.preview.emergentagent.com/api"
+BACKEND_URL = "https://medi-cameroon.preview.emergentagent.com/api"
 
 # Données de test camerounaises avec timestamps pour unicité
 import time

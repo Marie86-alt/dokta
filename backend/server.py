@@ -557,15 +557,16 @@ async def register_user(user_data: UserRegistration):
         print(f"Doctor inserted with _id: {result.inserted_id}")
     
     # Insérer l'utilisateur
-    await db.users.insert_one(user_dict)
+    result = await db.users.insert_one(user_dict)
+    print(f"User inserted with _id: {result.inserted_id}")
     
     # Créer le token JWT
     access_token = create_access_token(
         data={"sub": user_data.telephone, "user_type": user_data.type_utilisateur}
     )
     
-    # Préparer les données utilisateur à retourner (sans mot de passe)
-    user_data_return = {k: v for k, v in user_dict.items() if k != "mot_de_passe"}
+    # Préparer les données utilisateur à retourner (sans mot de passe et sans _id)
+    user_data_return = {k: v for k, v in user_dict.items() if k not in ["mot_de_passe", "_id"]}
     
     return Token(
         access_token=access_token,

@@ -564,7 +564,7 @@ const styles = StyleSheet.create({
   },
   searchResults: {
     position: 'absolute',
-    top: 70,
+    top: 75,
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',
@@ -573,9 +573,11 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,
     shadowRadius: 8,
-    elevation: 8,
+    elevation: 10,
     maxHeight: 300,
-    zIndex: 1000,
+    zIndex: 9999,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
   },
   searchLoading: {
     padding: 16,

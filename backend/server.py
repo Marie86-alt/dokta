@@ -411,6 +411,75 @@ async def get_doctor_patients(doctor_id: str):
     
     return sorted(patients, key=lambda p: p.get("last_appointment", ""), reverse=True)
 
+# Global Search Route
+@api_router.get("/search")
+async def global_search(q: str):
+    if len(q) < 2:
+        return {"results": []}
+    
+    query_lower = q.lower()
+    results = []
+    
+    try:
+        # Recherche des médecins
+        doctors = await db.doctors.find({"disponible": True}).to_list(100)
+        for doctor in doctors:
+            if (query_lower in doctor["nom"].lower() or 
+                query_lower in doctor["specialite"].lower()):
+                results.append({
+                    "id": doctor["id"],
+                    "type": "doctor",
+                    "title": doctor["nom"],
+                    "subtitle": doctor["specialite"],
+                    "metadata": f"{doctor['tarif']:,} FCFA • {doctor['experience']}",
+                    "data": doctor
+                })
+        
+        # Recherche des spécialités
+        specialties_list = [spec.value for spec in SpecialtyType]
+        for specialty in specialties_list:
+            if query_lower in specialty.lower():
+                # Compter les médecins de cette spécialité
+                count = await db.doctors.count_documents({
+                    "specialite": specialty,
+                    "disponible": True
+                })
+                results.append({
+                    "id": specialty.lower().replace(" ", "_"),
+                    "type": "specialty",
+                    "title": specialty,
+                    "subtitle": "Spécialité médicale",
+                    "metadata": f"{count} médecin{'s' if count > 1 else ''} disponible{'s' if count > 1 else ''}",
+                    "data": {"value": specialty, "label": specialty}
+                })
+        
+        # Recherche des patients (pour les médecins connectés)
+        # Cette partie nécessiterait l'ID du médecin connecté
+        patients = await db.users.find({"type": "patient"}).to_list(100)
+        for patient in patients:
+            if query_lower in patient["nom"].lower():
+                # Trouver la dernière consultation
+                last_appointment = await db.appointments.find_one(
+                    {"patient_id": patient["id"]},
+                    sort=[("created_at", -1)]
+                )
+                last_date = last_appointment["date"] if last_appointment else None
+                
+                results.append({
+                    "id": patient["id"],
+                    "type": "patient",
+                    "title": patient["nom"],
+                    "subtitle": "Patient",
+                    "metadata": f"Dernière consultation: {last_date or 'Aucune'}",
+                    "data": patient
+                })
+        
+        return {"results": results[:20]}  # Limiter à 20 résultats
+        
+    except Exception as e:
+        print(f"Erreur de recherche: {e}")
+        return {"results": []}
+
 # Include the router in the main app
 app.include_router(api_router)
 

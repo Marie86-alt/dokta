@@ -196,7 +196,7 @@ class DOKTABackendTester:
                 "patient_name": "Amadou Nkomo",
                 "patient_age": 28,
                 "date": "2024-12-27",
-                "time": "09:00",
+                "time": "14:00",  # Changed to a different time slot
                 "consultation_type": "cabinet",
                 "price": 15000,
                 "user_id": "test_user_cameroun_123"

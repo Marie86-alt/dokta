@@ -622,7 +622,7 @@ async def login_user(login_data: UserLogin):
 async def get_current_user_profile(current_user: TokenData = Depends(get_current_user)):
     """Obtenir le profil de l'utilisateur actuel"""
     
-    user = await db.users.find_one({"telephone": current_user.telephone})
+    user = await db.users.find_one({"telephone": current_user.telephone}, {"_id": 0})
     if not user:
         raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
     

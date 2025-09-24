@@ -164,50 +164,7 @@ export default function Index() {
       </View>
 
       {/* Quick Actions */}
-      <View style={styles.quickActionsSection}>
-        <Text style={styles.sectionTitleCentered}>Services rapides</Text>
-        <View style={styles.quickActionsGrid}>
-          <TouchableOpacity
-            style={styles.quickActionCard}
-            onPress={() => setActiveTab('rendez-vous')}
-          >
-            <View style={[styles.quickActionIcon, { backgroundColor: '#E8F5E8' }]}>
-              <Ionicons name="calendar" size={24} color="#2E8B57" />
-            </View>
-            <Text style={styles.quickActionText}>Prendre RDV</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.quickActionCard}
-            onPress={() => Alert.alert('Urgences', 'Service d\'urgence bientôt disponible')}
-          >
-            <View style={[styles.quickActionIcon, { backgroundColor: '#FFE8E8' }]}>
-              <Ionicons name="medical" size={24} color="#E74C3C" />
-            </View>
-            <Text style={styles.quickActionText}>Urgences</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={styles.quickActionCard}
-            onPress={() => setActiveTab('documents')}
-          >
-            <View style={[styles.quickActionIcon, { backgroundColor: '#F3E8FF' }]}>
-              <Ionicons name="document-text" size={24} color="#9B59B6" />
-            </View>
-            <Text style={styles.quickActionText}>Documents</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.quickActionCard}
-            onPress={() => setActiveTab('messages')}
-          >
-            <View style={[styles.quickActionIcon, { backgroundColor: '#E8F4FD' }]}>
-              <Ionicons name="chatbubbles" size={24} color="#3498DB" />
-            </View>
-            <Text style={styles.quickActionText}>Messages</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      {/* Section Services rapides supprimée selon demande utilisateur */}
 
       {/* Specialties */}
       <View style={styles.specialtiesSection}>

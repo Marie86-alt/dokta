@@ -350,7 +350,7 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.appTitle}>DOKTA</Text>
-          <Text style={styles.appSubtitle}>Votre santé en quelques clics</Text>
+          <Text style={styles.appSubtitle}>Votre santé en quelques clics - Cameroun</Text>
         </View>
         <TouchableOpacity 
           style={styles.headerButton}

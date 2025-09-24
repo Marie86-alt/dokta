@@ -493,6 +493,178 @@ async def global_search(q: str):
 # Include the router in the main app
 app.include_router(api_router)
 
+# Routes d'authentification
+@api_router.post("/auth/register", response_model=Token)
+async def register_user(user_data: UserRegistration):
+    """Inscription d'un nouvel utilisateur (patient ou médecin)"""
+    
+    # Validation du numéro camerounais
+    if not validate_cameroon_phone(user_data.telephone):
+        raise HTTPException(
+            status_code=400,
+            detail="Numéro de téléphone camerounais invalide. Format attendu: +237XXXXXXXXX"
+        )
+    
+    # Vérifier si l'utilisateur existe déjà
+    existing_user = await db.users.find_one({"telephone": user_data.telephone})
+    if existing_user:
+        raise HTTPException(
+            status_code=400,
+            detail="Un utilisateur avec ce numéro de téléphone existe déjà"
+        )
+    
+    # Hasher le mot de passe
+    hashed_password = get_password_hash(user_data.mot_de_passe)
+    
+    # Créer le nouvel utilisateur
+    user_dict = {
+        "id": str(uuid.uuid4()),
+        "nom": user_data.nom,
+        "telephone": user_data.telephone,
+        "mot_de_passe": hashed_password,
+        "type": user_data.type_utilisateur,
+        "created_at": datetime.utcnow().isoformat(),
+        "last_login": None
+    }
+    
+    # Ajouter les champs spécifiques selon le type
+    if user_data.type_utilisateur == "patient":
+        user_dict.update({
+            "age": user_data.age,
+            "ville": user_data.ville
+        })
+    elif user_data.type_utilisateur == "medecin":
+        user_dict.update({
+            "specialite": user_data.specialite,
+            "experience": user_data.experience,
+            "tarif": user_data.tarif,
+            "diplomes": user_data.diplomes,
+            "disponible": True,
+            "rating": 4.8  # Rating par défaut
+        })
+        
+        # Ajouter aussi dans la collection doctors pour compatibilité
+        doctor_dict = {
+            "id": user_dict["id"],
+            "nom": user_data.nom,
+            "specialite": user_data.specialite,
+            "experience": user_data.experience,
+            "tarif": user_data.tarif,
+            "diplomes": user_data.diplomes,
+            "disponible": True,
+            "rating": 4.8,
+            "telephone": user_data.telephone,
+            "created_at": datetime.utcnow().isoformat()
+        }
+        await db.doctors.insert_one(doctor_dict)
+    
+    # Insérer l'utilisateur
+    await db.users.insert_one(user_dict)
+    
+    # Créer le token JWT
+    access_token = create_access_token(
+        data={"sub": user_data.telephone, "user_type": user_data.type_utilisateur}
+    )
+    
+    # Préparer les données utilisateur à retourner (sans mot de passe)
+    user_data_return = {k: v for k, v in user_dict.items() if k != "mot_de_passe"}
+    
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        user_data=user_data_return
+    )
+
+@api_router.post("/auth/login", response_model=Token)
+async def login_user(login_data: UserLogin):
+    """Connexion d'un utilisateur"""
+    
+    # Validation du numéro camerounais
+    if not validate_cameroon_phone(login_data.telephone):
+        raise HTTPException(
+            status_code=400,
+            detail="Numéro de téléphone camerounais invalide"
+        )
+    
+    # Trouver l'utilisateur
+    user = await db.users.find_one({"telephone": login_data.telephone})
+    if not user:
+        raise HTTPException(
+            status_code=401,
+            detail="Numéro de téléphone ou mot de passe incorrect"
+        )
+    
+    # Vérifier le mot de passe
+    if not verify_password(login_data.mot_de_passe, user["mot_de_passe"]):
+        raise HTTPException(
+            status_code=401,
+            detail="Numéro de téléphone ou mot de passe incorrect"
+        )
+    
+    # Mettre à jour le dernier login
+    await db.users.update_one(
+        {"telephone": login_data.telephone},
+        {"$set": {"last_login": datetime.utcnow().isoformat()}}
+    )
+    
+    # Créer le token JWT
+    access_token = create_access_token(
+        data={"sub": login_data.telephone, "user_type": user["type"]}
+    )
+    
+    # Préparer les données utilisateur à retourner (sans mot de passe)
+    user_data_return = {k: v for k, v in user.items() if k != "mot_de_passe"}
+    
+    return Token(
+        access_token=access_token,
+        token_type="bearer",
+        user_data=user_data_return
+    )
+
+@api_router.get("/auth/me")
+async def get_current_user_profile(current_user: TokenData = Depends(get_current_user)):
+    """Obtenir le profil de l'utilisateur actuel"""
+    
+    user = await db.users.find_one({"telephone": current_user.telephone})
+    if not user:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Retourner les données sans le mot de passe
+    user_data = {k: v for k, v in user.items() if k != "mot_de_passe"}
+    return user_data
+
+@api_router.put("/auth/profile")
+async def update_user_profile(
+    profile_data: dict,
+    current_user: TokenData = Depends(get_current_user)
+):
+    """Mettre à jour le profil utilisateur"""
+    
+    # Enlever les champs non modifiables
+    forbidden_fields = ["id", "telephone", "type", "created_at", "mot_de_passe"]
+    update_data = {k: v for k, v in profile_data.items() if k not in forbidden_fields}
+    
+    if not update_data:
+        raise HTTPException(status_code=400, detail="Aucune donnée à mettre à jour")
+    
+    # Mettre à jour l'utilisateur
+    result = await db.users.update_one(
+        {"telephone": current_user.telephone},
+        {"$set": update_data}
+    )
+    
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Utilisateur non trouvé")
+    
+    # Si c'est un médecin, mettre à jour aussi la collection doctors
+    if current_user.user_type == "medecin":
+        await db.doctors.update_one(
+            {"telephone": current_user.telephone},
+            {"$set": update_data}
+        )
+    
+    return {"message": "Profil mis à jour avec succès"}
+
 app.add_middleware(
     CORSMiddleware,
     allow_credentials=True,

@@ -11,7 +11,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://carehub-cmr.preview.emergentagent.com/api"
+BACKEND_URL = "https://healthbookcm.preview.emergentagent.com/api"
 HEADERS = {"Content-Type": "application/json"}
 
 # Données de test camerounaises

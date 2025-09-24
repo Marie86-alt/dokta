@@ -1,15 +1,21 @@
-from fastapi import FastAPI, APIRouter, HTTPException
-from dotenv import load_dotenv
-from starlette.middleware.cors import CORSMiddleware
+from fastapi import FastAPI, APIRouter, HTTPException, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel, Field
+from datetime import datetime, date, time
+from typing import Optional, List
+import uuid
+from enum import Enum
 from motor.motor_asyncio import AsyncIOMotorClient
+from dotenv import load_dotenv
 import os
 import logging
 from pathlib import Path
-from pydantic import BaseModel, Field
-from typing import List, Optional
-import uuid
-from datetime import datetime, date, time
-from enum import Enum
+
+# Import du système d'authentification
+from auth import (
+    UserRegistration, UserLogin, Token, get_password_hash, verify_password, 
+    create_access_token, validate_cameroon_phone, get_current_user, TokenData
+)
 
 
 ROOT_DIR = Path(__file__).parent

@@ -238,6 +238,18 @@ frontend:
         agent: "main"
         comment: "Formulaire patient fonctionnel avec validation des données camerounaises intégré"
   
+  - task: "Flux de réservation complet"
+    implemented: true
+    working: true
+    file: "doctor-profile/[doctorId].tsx, patient-selection.tsx, booking/calendar.tsx, mobile-money-payment.tsx, booking-confirmation.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: true
+        agent: "main"
+        comment: "Flux complet de réservation implémenté: profil médecin -> sélection patient -> choix date/heure -> paiement Mobile Money simulé -> confirmation. Toutes les étapes sont fonctionnelles et intégrées."
+
   - task: "Paiement Mobile Money"
     implemented: true
     working: true

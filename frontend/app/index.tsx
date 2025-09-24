@@ -201,14 +201,14 @@ export default function Index() {
           </TouchableOpacity>
         </View>
 
-        {featuredDoctors.map((doctor) => (
+        {featuredDoctors.slice(0, 2).map((doctor) => (
           <TouchableOpacity
             key={doctor.id}
             style={styles.doctorCard}
             onPress={() => router.push(`/doctor-profile/${doctor.id}`)}
           >
             <View style={styles.doctorAvatar}>
-              <Ionicons name="person-circle" size={50} color="#2E8B57" />
+              <Ionicons name="person-circle" size={40} color="#2E8B57" />
             </View>
             <View style={styles.doctorInfo}>
               <Text style={styles.doctorName}>{doctor.nom}</Text>

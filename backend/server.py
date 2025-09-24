@@ -584,7 +584,7 @@ async def login_user(login_data: UserLogin):
         )
     
     # Trouver l'utilisateur
-    user = await db.users.find_one({"telephone": login_data.telephone})
+    user = await db.users.find_one({"telephone": login_data.telephone}, {"_id": 0})
     if not user:
         raise HTTPException(
             status_code=401,

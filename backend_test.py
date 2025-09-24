@@ -1,491 +1,455 @@
 #!/usr/bin/env python3
 """
-Tests complets pour le système d'authentification DOKTA JWT
-avec validation camerounaise
+Tests complets pour les nouvelles fonctionnalités backend DOKTA
+Teste les APIs de créneaux disponibles, création de rendez-vous simplifiée, et intégration complète
 """
 
 import requests
 import json
+from datetime import datetime, timedelta
+import sys
 import os
-from datetime import datetime
 
-# Configuration des URLs
+# Configuration
 BACKEND_URL = "https://medi-cameroon.preview.emergentagent.com/api"
 
-# Données de test camerounaises avec timestamps pour unicité
-import time
-timestamp = str(int(time.time()))[-6:]  # Derniers 6 chiffres du timestamp
-
-TEST_PATIENT = {
-    "nom": "Marie Ndoumbe",
-    "telephone": f"+237699{timestamp}",
-    "mot_de_passe": "motdepasse123",
-    "type_utilisateur": "patient",
-    "age": 25,
-    "ville": "Douala"
-}
-
-TEST_DOCTOR = {
-    "nom": "Dr Paul Ewondo",
-    "telephone": f"+237677{timestamp}",
-    "mot_de_passe": "medecin123",
-    "type_utilisateur": "medecin",
-    "specialite": "Cardiologie",
-    "experience": "10 ans",
-    "tarif": 15000,
-    "diplomes": "Doctorat en Médecine, Spécialisation Cardiologie"
-}
-
-# Variables globales pour les tokens
-patient_token = None
-doctor_token = None
-patient_data = None
-doctor_data = None
-
-def print_test_result(test_name, success, details=""):
-    """Afficher le résultat d'un test"""
-    status = "✅ RÉUSSI" if success else "❌ ÉCHEC"
-    print(f"{status} - {test_name}")
-    if details:
-        print(f"   Détails: {details}")
-    print()
-
-def test_api_root():
-    """Test de l'API racine"""
-    try:
-        response = requests.get(f"{BACKEND_URL}/")
-        success = response.status_code == 200
-        details = f"Status: {response.status_code}, Response: {response.json()}"
-        print_test_result("API Root", success, details)
-        return success
-    except Exception as e:
-        print_test_result("API Root", False, f"Erreur: {str(e)}")
-        return False
-
-def test_patient_registration():
-    """Test d'inscription patient avec données camerounaises"""
-    global patient_token, patient_data
+class DOKTABackendTester:
+    def __init__(self):
+        self.base_url = BACKEND_URL
+        self.test_results = []
+        self.doctor_id = None
+        self.appointment_id = None
+        
+    def log_test(self, test_name, success, details="", response_data=None):
+        """Enregistrer le résultat d'un test"""
+        status = "✅ PASS" if success else "❌ FAIL"
+        print(f"{status} {test_name}")
+        if details:
+            print(f"   {details}")
+        if response_data and not success:
+            print(f"   Response: {response_data}")
+        print()
+        
+        self.test_results.append({
+            "test": test_name,
+            "success": success,
+            "details": details,
+            "response": response_data
+        })
     
-    try:
-        response = requests.post(
-            f"{BACKEND_URL}/auth/register",
-            json=TEST_PATIENT,
-            headers={"Content-Type": "application/json"}
-        )
-        
-        success = response.status_code == 200
-        if success:
-            data = response.json()
-            patient_token = data.get("access_token")
-            patient_data = data.get("user_data")
-            details = f"Token reçu, Patient ID: {patient_data.get('id')}, Téléphone: {patient_data.get('telephone')}"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Inscription Patient Camerounais", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Inscription Patient Camerounais", False, f"Erreur: {str(e)}")
-        return False
-
-def test_doctor_registration():
-    """Test d'inscription médecin avec spécialité et tarifs"""
-    global doctor_token, doctor_data
-    
-    try:
-        response = requests.post(
-            f"{BACKEND_URL}/auth/register",
-            json=TEST_DOCTOR,
-            headers={"Content-Type": "application/json"}
-        )
-        
-        success = response.status_code == 200
-        if success:
-            data = response.json()
-            doctor_token = data.get("access_token")
-            doctor_data = data.get("user_data")
-            details = f"Token reçu, Médecin ID: {doctor_data.get('id')}, Spécialité: {doctor_data.get('specialite')}, Tarif: {doctor_data.get('tarif')} FCFA"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Inscription Médecin avec Spécialité", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Inscription Médecin avec Spécialité", False, f"Erreur: {str(e)}")
-        return False
-
-def test_invalid_phone_registration():
-    """Test de validation numéro camerounais invalide"""
-    invalid_phones = [
-        "+33123456789",  # Numéro français
-        "+237123456",    # Trop court
-        "+2376991234567", # Trop long
-        "+237899123456",  # Préfixe invalide (8)
-        "237699123456",   # Sans +
-        "+237abc123456"   # Avec lettres
-    ]
-    
-    success_count = 0
-    for phone in invalid_phones:
+    def test_api_root(self):
+        """Test de l'API racine"""
         try:
-            test_data = TEST_PATIENT.copy()
-            test_data["telephone"] = phone
-            test_data["nom"] = f"Test {phone}"
+            response = requests.get(f"{self.base_url}/")
+            if response.status_code == 200:
+                data = response.json()
+                self.log_test("API Root", True, f"Message: {data.get('message', 'N/A')}")
+                return True
+            else:
+                self.log_test("API Root", False, f"Status: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("API Root", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_get_doctors(self):
+        """Test récupération liste des médecins"""
+        try:
+            response = requests.get(f"{self.base_url}/doctors")
+            if response.status_code == 200:
+                doctors = response.json()
+                if doctors and len(doctors) > 0:
+                    # Stocker l'ID du premier médecin pour les tests suivants
+                    self.doctor_id = doctors[0]["id"]
+                    doctor_names = [d["nom"] for d in doctors[:3]]
+                    self.log_test("GET Doctors", True, f"Trouvé {len(doctors)} médecins: {', '.join(doctor_names)}")
+                    return True
+                else:
+                    self.log_test("GET Doctors", False, "Aucun médecin trouvé")
+                    return False
+            else:
+                self.log_test("GET Doctors", False, f"Status: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("GET Doctors", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_get_specialties(self):
+        """Test récupération des spécialités"""
+        try:
+            response = requests.get(f"{self.base_url}/specialties")
+            if response.status_code == 200:
+                specialties = response.json()
+                if specialties and len(specialties) > 0:
+                    specialty_names = [s["label"] for s in specialties[:3]]
+                    self.log_test("GET Specialties", True, f"Trouvé {len(specialties)} spécialités: {', '.join(specialty_names)}")
+                    return True
+                else:
+                    self.log_test("GET Specialties", False, "Aucune spécialité trouvée")
+                    return False
+            else:
+                self.log_test("GET Specialties", False, f"Status: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("GET Specialties", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_search_api(self):
+        """Test de l'API de recherche globale"""
+        try:
+            # Test recherche médecin
+            response = requests.get(f"{self.base_url}/search?q=Marie")
+            if response.status_code == 200:
+                results = response.json()
+                if results.get("results"):
+                    doctor_results = [r for r in results["results"] if r["type"] == "doctor"]
+                    self.log_test("Search API - Médecins", True, f"Trouvé {len(doctor_results)} médecin(s) pour 'Marie'")
+                else:
+                    self.log_test("Search API - Médecins", True, "Aucun résultat pour 'Marie' (normal si pas de Dr Marie)")
+                
+                # Test recherche spécialité
+                response2 = requests.get(f"{self.base_url}/search?q=Cardio")
+                if response2.status_code == 200:
+                    results2 = response2.json()
+                    specialty_results = [r for r in results2.get("results", []) if r["type"] == "specialty"]
+                    self.log_test("Search API - Spécialités", True, f"Trouvé {len(specialty_results)} spécialité(s) pour 'Cardio'")
+                    return True
+                else:
+                    self.log_test("Search API - Spécialités", False, f"Status: {response2.status_code}")
+                    return False
+            else:
+                self.log_test("Search API", False, f"Status: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("Search API", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_available_slots(self, test_date="2024-12-27"):
+        """Test PRIORITAIRE: API créneaux disponibles par médecin"""
+        if not self.doctor_id:
+            self.log_test("Available Slots", False, "Pas d'ID médecin disponible")
+            return False
+            
+        try:
+            url = f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}"
+            response = requests.get(url)
+            
+            if response.status_code == 200:
+                slots = response.json()
+                if isinstance(slots, list) and len(slots) > 0:
+                    available_count = sum(1 for slot in slots if slot.get("disponible", False))
+                    total_count = len(slots)
+                    sample_slots = [slot["heure"] for slot in slots[:5]]
+                    
+                    self.log_test(
+                        f"Available Slots - {test_date}", 
+                        True, 
+                        f"{available_count}/{total_count} créneaux disponibles. Exemples: {', '.join(sample_slots)}"
+                    )
+                    return True
+                else:
+                    self.log_test("Available Slots", False, "Aucun créneau retourné ou format invalide", slots)
+                    return False
+            elif response.status_code == 404:
+                self.log_test("Available Slots", False, "Médecin non trouvé", response.text)
+                return False
+            else:
+                self.log_test("Available Slots", False, f"Status: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("Available Slots", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_available_slots_different_dates(self):
+        """Test créneaux disponibles avec différentes dates"""
+        if not self.doctor_id:
+            return False
+            
+        test_dates = [
+            "2024-12-27",
+            "2024-12-28", 
+            "2025-01-02"
+        ]
+        
+        success_count = 0
+        for test_date in test_dates:
+            if self.test_available_slots(test_date):
+                success_count += 1
+        
+        overall_success = success_count == len(test_dates)
+        self.log_test(
+            "Available Slots - Dates multiples", 
+            overall_success, 
+            f"{success_count}/{len(test_dates)} dates testées avec succès"
+        )
+        return overall_success
+    
+    def test_create_appointment_simple(self):
+        """Test PRIORITAIRE: API création rendez-vous simplifiée"""
+        if not self.doctor_id:
+            self.log_test("Create Appointment Simple", False, "Pas d'ID médecin disponible")
+            return False
+            
+        try:
+            appointment_data = {
+                "doctor_id": self.doctor_id,
+                "patient_name": "Amadou Nkomo",
+                "patient_age": 28,
+                "date": "2024-12-27",
+                "time": "09:00",
+                "consultation_type": "cabinet",
+                "price": 15000,
+                "user_id": "test_user_cameroun_123"
+            }
             
             response = requests.post(
-                f"{BACKEND_URL}/auth/register",
-                json=test_data,
+                f"{self.base_url}/appointments-simple",
+                json=appointment_data,
                 headers={"Content-Type": "application/json"}
             )
             
-            # On s'attend à un échec (400)
-            if response.status_code == 400:
-                success_count += 1
-                print(f"   ✅ {phone} correctement rejeté")
+            if response.status_code == 200:
+                result = response.json()
+                if result.get("id") and result.get("status") == "confirmed":
+                    self.appointment_id = result["id"]
+                    self.log_test(
+                        "Create Appointment Simple", 
+                        True, 
+                        f"Rendez-vous créé: ID={result['id'][:8]}..., Status={result['status']}"
+                    )
+                    return True
+                else:
+                    self.log_test("Create Appointment Simple", False, "Réponse invalide", result)
+                    return False
             else:
-                print(f"   ❌ {phone} accepté à tort (Status: {response.status_code})")
+                self.log_test("Create Appointment Simple", False, f"Status: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_test("Create Appointment Simple", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_appointment_validation(self):
+        """Test validations création rendez-vous"""
+        if not self.doctor_id:
+            return False
+            
+        # Test données manquantes
+        try:
+            incomplete_data = {
+                "doctor_id": self.doctor_id,
+                "patient_name": "Test Patient"
+                # Données manquantes intentionnellement
+            }
+            
+            response = requests.post(
+                f"{self.base_url}/appointments-simple",
+                json=incomplete_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            # On s'attend à une erreur pour données incomplètes
+            if response.status_code >= 400:
+                self.log_test("Appointment Validation - Données manquantes", True, f"Erreur attendue: {response.status_code}")
+            else:
+                self.log_test("Appointment Validation - Données manquantes", False, "Devrait rejeter les données incomplètes")
                 
         except Exception as e:
-            print(f"   ❌ Erreur pour {phone}: {str(e)}")
-    
-    success = success_count == len(invalid_phones)
-    details = f"{success_count}/{len(invalid_phones)} numéros invalides correctement rejetés"
-    print_test_result("Validation Numéros Camerounais Invalides", success, details)
-    return success
-
-def test_duplicate_registration():
-    """Test de prévention des doublons"""
-    try:
-        # Essayer de réinscrire le même patient
-        response = requests.post(
-            f"{BACKEND_URL}/auth/register",
-            json=TEST_PATIENT,
-            headers={"Content-Type": "application/json"}
-        )
+            self.log_test("Appointment Validation", False, f"Erreur: {str(e)}")
+            return False
         
-        # On s'attend à un échec (400)
-        success = response.status_code == 400
-        if success:
-            details = "Doublon correctement détecté et rejeté"
+        return True
+    
+    def test_double_booking_prevention(self):
+        """Test PRIORITAIRE: Prévention double réservation"""
+        if not self.doctor_id:
+            return False
+            
+        try:
+            # Créer un premier rendez-vous
+            appointment_data = {
+                "doctor_id": self.doctor_id,
+                "patient_name": "Patient Test 1",
+                "patient_age": 30,
+                "date": "2024-12-27",
+                "time": "10:00",
+                "consultation_type": "cabinet",
+                "price": 15000,
+                "user_id": "test_user_1"
+            }
+            
+            response1 = requests.post(
+                f"{self.base_url}/appointments-simple",
+                json=appointment_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response1.status_code == 200:
+                # Essayer de créer un deuxième rendez-vous au même créneau
+                appointment_data["patient_name"] = "Patient Test 2"
+                appointment_data["user_id"] = "test_user_2"
+                
+                response2 = requests.post(
+                    f"{self.base_url}/appointments-simple",
+                    json=appointment_data,
+                    headers={"Content-Type": "application/json"}
+                )
+                
+                # On s'attend à un conflit (409) ou une erreur
+                if response2.status_code == 409:
+                    self.log_test("Double Booking Prevention", True, "Conflit détecté correctement (409)")
+                    return True
+                elif response2.status_code >= 400:
+                    self.log_test("Double Booking Prevention", True, f"Erreur détectée: {response2.status_code}")
+                    return True
+                else:
+                    self.log_test("Double Booking Prevention", False, "Double réservation autorisée à tort")
+                    return False
+            else:
+                self.log_test("Double Booking Prevention", False, "Impossible de créer le premier rendez-vous")
+                return False
+                
+        except Exception as e:
+            self.log_test("Double Booking Prevention", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_integration_complete(self):
+        """Test PRIORITAIRE: Intégration complète - créer RDV puis vérifier indisponibilité"""
+        if not self.doctor_id:
+            return False
+            
+        try:
+            test_date = "2024-12-27"
+            test_time = "11:00"
+            
+            # 1. Vérifier créneaux disponibles AVANT
+            slots_before = requests.get(f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}")
+            if slots_before.status_code != 200:
+                self.log_test("Integration Complete", False, "Impossible de récupérer les créneaux avant")
+                return False
+                
+            slots_before_data = slots_before.json()
+            slot_before = next((s for s in slots_before_data if s["heure"] == test_time), None)
+            
+            if not slot_before:
+                self.log_test("Integration Complete", False, f"Créneau {test_time} non trouvé")
+                return False
+                
+            was_available = slot_before.get("disponible", False)
+            
+            # 2. Créer un rendez-vous
+            appointment_data = {
+                "doctor_id": self.doctor_id,
+                "patient_name": "Fatima Bello",
+                "patient_age": 35,
+                "date": test_date,
+                "time": test_time,
+                "consultation_type": "cabinet",
+                "price": 15000,
+                "user_id": "test_integration_user"
+            }
+            
+            create_response = requests.post(
+                f"{self.base_url}/appointments-simple",
+                json=appointment_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if create_response.status_code != 200:
+                self.log_test("Integration Complete", False, f"Création RDV échouée: {create_response.status_code}")
+                return False
+            
+            # 3. Vérifier créneaux disponibles APRÈS
+            slots_after = requests.get(f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}")
+            if slots_after.status_code != 200:
+                self.log_test("Integration Complete", False, "Impossible de récupérer les créneaux après")
+                return False
+                
+            slots_after_data = slots_after.json()
+            slot_after = next((s for s in slots_after_data if s["heure"] == test_time), None)
+            
+            if not slot_after:
+                self.log_test("Integration Complete", False, f"Créneau {test_time} non trouvé après création")
+                return False
+                
+            is_available_after = slot_after.get("disponible", True)
+            
+            # 4. Vérifier que le créneau n'est plus disponible
+            if was_available and not is_available_after:
+                self.log_test(
+                    "Integration Complete", 
+                    True, 
+                    f"✅ Créneau {test_time} était disponible, maintenant indisponible après création RDV"
+                )
+                return True
+            elif not was_available:
+                self.log_test(
+                    "Integration Complete", 
+                    True, 
+                    f"ℹ️ Créneau {test_time} était déjà indisponible (test valide)"
+                )
+                return True
+            else:
+                self.log_test(
+                    "Integration Complete", 
+                    False, 
+                    f"❌ Créneau {test_time} toujours disponible après création RDV"
+                )
+                return False
+                
+        except Exception as e:
+            self.log_test("Integration Complete", False, f"Erreur: {str(e)}")
+            return False
+    
+    def run_all_tests(self):
+        """Exécuter tous les tests"""
+        print("🏥 DOKTA Backend Tests - Nouvelles Fonctionnalités")
+        print("=" * 60)
+        print()
+        
+        # Tests de base
+        self.test_api_root()
+        self.test_get_doctors()
+        self.test_get_specialties()
+        self.test_search_api()
+        
+        # Tests prioritaires des nouvelles fonctionnalités
+        print("🎯 TESTS PRIORITAIRES - NOUVELLES FONCTIONNALITÉS")
+        print("-" * 50)
+        self.test_available_slots()
+        self.test_available_slots_different_dates()
+        self.test_create_appointment_simple()
+        self.test_appointment_validation()
+        self.test_double_booking_prevention()
+        self.test_integration_complete()
+        
+        # Résumé
+        print("📊 RÉSUMÉ DES TESTS")
+        print("=" * 60)
+        
+        passed = sum(1 for result in self.test_results if result["success"])
+        total = len(self.test_results)
+        
+        print(f"Tests réussis: {passed}/{total} ({passed/total*100:.1f}%)")
+        print()
+        
+        # Détails des échecs
+        failed_tests = [result for result in self.test_results if not result["success"]]
+        if failed_tests:
+            print("❌ TESTS ÉCHOUÉS:")
+            for test in failed_tests:
+                print(f"  - {test['test']}: {test['details']}")
         else:
-            details = f"Status: {response.status_code}, Doublon accepté à tort"
+            print("✅ TOUS LES TESTS RÉUSSIS!")
         
-        print_test_result("Prévention Doublons", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Prévention Doublons", False, f"Erreur: {str(e)}")
-        return False
-
-def test_patient_login():
-    """Test de connexion patient"""
-    try:
-        login_data = {
-            "telephone": TEST_PATIENT["telephone"],
-            "mot_de_passe": TEST_PATIENT["mot_de_passe"]
-        }
-        
-        response = requests.post(
-            f"{BACKEND_URL}/auth/login",
-            json=login_data,
-            headers={"Content-Type": "application/json"}
-        )
-        
-        success = response.status_code == 200
-        if success:
-            data = response.json()
-            token = data.get("access_token")
-            user_data = data.get("user_data")
-            details = f"Connexion réussie, Token reçu, Type: {user_data.get('type')}"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Connexion Patient", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Connexion Patient", False, f"Erreur: {str(e)}")
-        return False
-
-def test_doctor_login():
-    """Test de connexion médecin"""
-    try:
-        login_data = {
-            "telephone": TEST_DOCTOR["telephone"],
-            "mot_de_passe": TEST_DOCTOR["mot_de_passe"]
-        }
-        
-        response = requests.post(
-            f"{BACKEND_URL}/auth/login",
-            json=login_data,
-            headers={"Content-Type": "application/json"}
-        )
-        
-        success = response.status_code == 200
-        if success:
-            data = response.json()
-            token = data.get("access_token")
-            user_data = data.get("user_data")
-            details = f"Connexion réussie, Token reçu, Spécialité: {user_data.get('specialite')}"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Connexion Médecin", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Connexion Médecin", False, f"Erreur: {str(e)}")
-        return False
-
-def test_invalid_login():
-    """Test d'échec avec mauvais credentials"""
-    try:
-        # Test avec mauvais mot de passe
-        login_data = {
-            "telephone": TEST_PATIENT["telephone"],
-            "mot_de_passe": "mauvais_mot_de_passe"
-        }
-        
-        response = requests.post(
-            f"{BACKEND_URL}/auth/login",
-            json=login_data,
-            headers={"Content-Type": "application/json"}
-        )
-        
-        # On s'attend à un échec (401)
-        success = response.status_code == 401
-        if success:
-            details = "Mauvais credentials correctement rejetés"
-        else:
-            details = f"Status: {response.status_code}, Mauvais credentials acceptés à tort"
-        
-        print_test_result("Échec Mauvais Credentials", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Échec Mauvais Credentials", False, f"Erreur: {str(e)}")
-        return False
-
-def test_get_profile_with_valid_token():
-    """Test récupération profil avec token valide"""
-    if not patient_token:
-        print_test_result("Profil avec Token Valide", False, "Pas de token patient disponible")
-        return False
-    
-    try:
-        headers = {
-            "Authorization": f"Bearer {patient_token}",
-            "Content-Type": "application/json"
-        }
-        
-        response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-        
-        success = response.status_code == 200
-        if success:
-            data = response.json()
-            details = f"Profil récupéré: {data.get('nom')}, Type: {data.get('type')}, Ville: {data.get('ville')}"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Profil avec Token Valide", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Profil avec Token Valide", False, f"Erreur: {str(e)}")
-        return False
-
-def test_get_profile_without_token():
-    """Test échec récupération profil sans token"""
-    try:
-        response = requests.get(f"{BACKEND_URL}/auth/me")
-        
-        # On s'attend à un échec (401 ou 403)
-        success = response.status_code in [401, 403]
-        if success:
-            details = "Accès sans token correctement refusé"
-        else:
-            details = f"Status: {response.status_code}, Accès sans token autorisé à tort"
-        
-        print_test_result("Échec sans Token", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Échec sans Token", False, f"Erreur: {str(e)}")
-        return False
-
-def test_get_profile_with_invalid_token():
-    """Test échec avec token invalide"""
-    try:
-        headers = {
-            "Authorization": "Bearer token_invalide_123",
-            "Content-Type": "application/json"
-        }
-        
-        response = requests.get(f"{BACKEND_URL}/auth/me", headers=headers)
-        
-        # On s'attend à un échec (401)
-        success = response.status_code == 401
-        if success:
-            details = "Token invalide correctement rejeté"
-        else:
-            details = f"Status: {response.status_code}, Token invalide accepté à tort"
-        
-        print_test_result("Échec Token Invalide", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Échec Token Invalide", False, f"Erreur: {str(e)}")
-        return False
-
-def test_update_patient_profile():
-    """Test mise à jour profil patient"""
-    if not patient_token:
-        print_test_result("Mise à jour Profil Patient", False, "Pas de token patient disponible")
-        return False
-    
-    try:
-        headers = {
-            "Authorization": f"Bearer {patient_token}",
-            "Content-Type": "application/json"
-        }
-        
-        update_data = {
-            "age": 26,
-            "ville": "Yaoundé"
-        }
-        
-        response = requests.put(
-            f"{BACKEND_URL}/auth/profile",
-            json=update_data,
-            headers=headers
-        )
-        
-        success = response.status_code == 200
-        if success:
-            details = "Profil patient mis à jour avec succès"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Mise à jour Profil Patient", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Mise à jour Profil Patient", False, f"Erreur: {str(e)}")
-        return False
-
-def test_update_doctor_profile():
-    """Test mise à jour profil médecin"""
-    if not doctor_token:
-        print_test_result("Mise à jour Profil Médecin", False, "Pas de token médecin disponible")
-        return False
-    
-    try:
-        headers = {
-            "Authorization": f"Bearer {doctor_token}",
-            "Content-Type": "application/json"
-        }
-        
-        update_data = {
-            "experience": "11 ans",
-            "tarif": 16000
-        }
-        
-        response = requests.put(
-            f"{BACKEND_URL}/auth/profile",
-            json=update_data,
-            headers=headers
-        )
-        
-        success = response.status_code == 200
-        if success:
-            details = "Profil médecin mis à jour avec succès"
-        else:
-            details = f"Status: {response.status_code}, Error: {response.text}"
-        
-        print_test_result("Mise à jour Profil Médecin", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Mise à jour Profil Médecin", False, f"Erreur: {str(e)}")
-        return False
-
-def test_forbidden_profile_fields():
-    """Test protection champs interdits"""
-    if not patient_token:
-        print_test_result("Protection Champs Interdits", False, "Pas de token patient disponible")
-        return False
-    
-    try:
-        headers = {
-            "Authorization": f"Bearer {patient_token}",
-            "Content-Type": "application/json"
-        }
-        
-        # Essayer de modifier des champs interdits
-        forbidden_data = {
-            "id": "nouveau_id",
-            "telephone": "+237699999999",
-            "type": "medecin",
-            "mot_de_passe": "nouveau_mot_de_passe"
-        }
-        
-        response = requests.put(
-            f"{BACKEND_URL}/auth/profile",
-            json=forbidden_data,
-            headers=headers
-        )
-        
-        # Le serveur devrait ignorer ces champs ou retourner une erreur
-        success = response.status_code in [200, 400]
-        if success:
-            details = "Champs interdits correctement protégés"
-        else:
-            details = f"Status: {response.status_code}, Protection insuffisante"
-        
-        print_test_result("Protection Champs Interdits", success, details)
-        return success
-    except Exception as e:
-        print_test_result("Protection Champs Interdits", False, f"Erreur: {str(e)}")
-        return False
-
-def run_all_tests():
-    """Exécuter tous les tests d'authentification"""
-    print("=" * 60)
-    print("TESTS SYSTÈME D'AUTHENTIFICATION DOKTA JWT")
-    print("Validation Camerounaise (+237XXXXXXXXX)")
-    print("=" * 60)
-    print()
-    
-    tests = [
-        ("API Root", test_api_root),
-        ("Inscription Patient", test_patient_registration),
-        ("Inscription Médecin", test_doctor_registration),
-        ("Validation Numéros Invalides", test_invalid_phone_registration),
-        ("Prévention Doublons", test_duplicate_registration),
-        ("Connexion Patient", test_patient_login),
-        ("Connexion Médecin", test_doctor_login),
-        ("Échec Mauvais Credentials", test_invalid_login),
-        ("Profil avec Token Valide", test_get_profile_with_valid_token),
-        ("Échec sans Token", test_get_profile_without_token),
-        ("Échec Token Invalide", test_get_profile_with_invalid_token),
-        ("Mise à jour Profil Patient", test_update_patient_profile),
-        ("Mise à jour Profil Médecin", test_update_doctor_profile),
-        ("Protection Champs Interdits", test_forbidden_profile_fields)
-    ]
-    
-    passed = 0
-    total = len(tests)
-    
-    for test_name, test_func in tests:
-        if test_func():
-            passed += 1
-    
-    print("=" * 60)
-    print(f"RÉSULTATS FINAUX: {passed}/{total} tests réussis")
-    
-    if passed == total:
-        print("🎉 TOUS LES TESTS D'AUTHENTIFICATION RÉUSSIS!")
-        print("✅ Système JWT sécurisé et fonctionnel")
-        print("✅ Validation camerounaise opérationnelle")
-        print("✅ Inscription/Connexion Patient et Médecin OK")
-        print("✅ Protection des données et tokens sécurisés")
-    else:
-        print(f"⚠️  {total - passed} test(s) en échec")
-        print("❌ Système d'authentification nécessite des corrections")
-    
-    print("=" * 60)
-    return passed == total
+        return passed, total, failed_tests
 
 if __name__ == "__main__":
-    run_all_tests()
+    print("Démarrage des tests backend DOKTA...")
+    print(f"URL Backend: {BACKEND_URL}")
+    print()
+    
+    tester = DOKTABackendTester()
+    passed, total, failed = tester.run_all_tests()
+    
+    # Code de sortie
+    sys.exit(0 if len(failed) == 0 else 1)

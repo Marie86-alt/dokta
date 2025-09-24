@@ -942,7 +942,47 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#E74C3C',
   },
-  // Bouton flottant médecin
+  // Styles pour l'onglet Rendez-vous
+  rdvActions: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+  },
+  consultationChoiceButton: {
+    backgroundColor: '#2E8B57',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 20,
+    gap: 8,
+  },
+  consultationChoiceButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  consultationTypes: {
+    backgroundColor: '#F8F9FA',
+    padding: 16,
+    borderRadius: 12,
+  },
+  consultationTypesTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 12,
+  },
+  consultationType: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 8,
+    gap: 8,
+  },
+  consultationTypeText: {
+    fontSize: 14,
+    color: '#666',
+  },
   doctorFloatingButton: {
     position: 'absolute',
     bottom: 100,

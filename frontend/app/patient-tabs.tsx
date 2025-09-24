@@ -175,16 +175,15 @@ export default function PatientTabs() {
     >
       {/* Search Bar */}
       <View style={styles.searchContainer}>
-        <View style={styles.searchBar}>
+        <TouchableOpacity
+          style={styles.searchBar}
+          onPress={() => router.push('/global-search')}
+        >
           <Ionicons name="search" size={20} color="#666" />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Rechercher un médecin ou spécialité..."
-            placeholderTextColor="#999"
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-        </View>
+          <Text style={styles.searchPlaceholder}>
+            Rechercher médecins, patients, spécialités...
+          </Text>
+        </TouchableOpacity>
       </View>
 
       {/* Quick Actions */}

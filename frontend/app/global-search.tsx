@@ -46,62 +46,12 @@ export default function GlobalSearch() {
   const performSearch = async () => {
     setLoading(true);
     try {
-      const searchResults: SearchResult[] = [];
-
-      // Recherche des médecins
-      const doctorsResponse = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/doctors`);
-      const doctors = await doctorsResponse.json();
-      
-      const filteredDoctors = doctors.filter((doctor: any) =>
-        doctor.nom.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        doctor.specialite.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      filteredDoctors.forEach((doctor: any) => {
-        searchResults.push({
-          id: doctor.id,
-          type: 'doctor',
-          title: doctor.nom,
-          subtitle: doctor.specialite,
-          metadata: `${doctor.tarif.toLocaleString()} FCFA • ${doctor.experience}`,
-          data: doctor
-        });
-      });
-
-      // Recherche des spécialités
-      const specialtiesResponse = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/specialties`);
-      const specialties = await specialtiesResponse.json();
-      
-      const filteredSpecialties = specialties.filter((specialty: any) =>
-        specialty.label.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-
-      filteredSpecialties.forEach((specialty: any) => {
-        searchResults.push({
-          id: specialty.value,
-          type: 'specialty',
-          title: specialty.label,
-          subtitle: 'Spécialité médicale',
-          metadata: `Voir tous les médecins`,
-          data: specialty
-        });
-      });
-
-      // Simulation recherche patients (à implémenter avec une vraie API)
-      if (searchQuery.toLowerCase().includes('patient') || searchQuery.toLowerCase().includes('amina')) {
-        searchResults.push({
-          id: 'patient-1',
-          type: 'patient',
-          title: 'Amina Nkomo',
-          subtitle: 'Patient',
-          metadata: 'Dernière consultation: 24/09/2024',
-          data: { nom: 'Amina Nkomo', telephone: '+237695123456' }
-        });
-      }
-
-      setResults(searchResults);
+      const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/search?q=${encodeURIComponent(searchQuery)}`);
+      const data = await response.json();
+      setResults(data.results || []);
     } catch (error) {
       console.error('Erreur de recherche:', error);
+      setResults([]);
     } finally {
       setLoading(false);
     }

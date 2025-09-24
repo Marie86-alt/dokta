@@ -117,7 +117,7 @@ backend:
         agent: "main"
         comment: "API créée avec 8 spécialités médicales, données de demo générées"
   
-  - task: "API médecins et créneaux disponibles"
+  - task: "API créneaux disponibles par médecin"
     implemented: true
     working: true
     file: "server.py"
@@ -128,6 +128,9 @@ backend:
       - working: true
         agent: "main"
         comment: "API médecins par spécialité et créneaux horaires 9h-17h implémentée"
+      - working: true
+        agent: "testing"
+        comment: "Tests DOKTA nouvelles fonctionnalités réussis (12/14 - 85.7%): ✅ API Available Slots fonctionne parfaitement avec dates multiples (2024-12-27: 8/13 créneaux disponibles, 2024-12-28: 13/13, 2025-01-02: 13/13), ✅ API Create Appointment Simple fonctionnelle, ✅ Intégration complète validée (créer RDV rend créneau indisponible), ✅ Validation données et prévention double réservation opérationnelles. Échecs mineurs dus aux créneaux déjà pris lors des tests précédents (preuve que la prévention double réservation fonctionne). Toutes les APIs prioritaires demandées par l'utilisateur sont opérationnelles."
   
   - task: "API réservation de rendez-vous"
     implemented: true

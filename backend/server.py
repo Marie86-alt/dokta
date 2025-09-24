@@ -152,12 +152,6 @@ async def get_doctors(specialite: Optional[SpecialtyType] = None):
     doctors = await db.doctors.find(query).to_list(100)
     return [Doctor(**doctor) for doctor in doctors]
 
-@api_router.get("/doctors/{doctor_id}", response_model=Doctor)
-async def get_doctor(doctor_id: str):
-    doctor = await db.doctors.find_one({"id": doctor_id})
-    if not doctor:
-        raise HTTPException(status_code=404, detail="Médecin non trouvé")
-    return Doctor(**doctor)
 
 # Specialties route
 @api_router.get("/specialties")

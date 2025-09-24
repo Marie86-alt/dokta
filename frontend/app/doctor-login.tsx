@@ -38,7 +38,7 @@ export default function DoctorLogin() {
       
       if (doctor) {
         router.replace({
-          pathname: '/doctor-dashboard',
+          pathname: '/doctor-tabs',
           params: { doctorId: doctor.id }
         });
       } else {

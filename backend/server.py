@@ -467,13 +467,15 @@ async def global_search(q: str):
                 )
                 last_date = last_appointment["date"] if last_appointment else None
                 
+                # Convert to User model to handle serialization
+                patient_obj = User(**patient)
                 results.append({
                     "id": patient["id"],
                     "type": "patient",
                     "title": patient["nom"],
                     "subtitle": "Patient",
                     "metadata": f"Dernière consultation: {last_date or 'Aucune'}",
-                    "data": patient
+                    "data": patient_obj.dict()
                 })
         
         return {"results": results[:20]}  # Limiter à 20 résultats

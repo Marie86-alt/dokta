@@ -12,10 +12,13 @@ from datetime import datetime
 # Configuration des URLs
 BACKEND_URL = "https://healthbookcm.preview.emergentagent.com/api"
 
-# Données de test camerounaises
+# Données de test camerounaises avec timestamps pour unicité
+import time
+timestamp = str(int(time.time()))[-6:]  # Derniers 6 chiffres du timestamp
+
 TEST_PATIENT = {
     "nom": "Marie Ndoumbe",
-    "telephone": "+237699123456",
+    "telephone": f"+237699{timestamp}",
     "mot_de_passe": "motdepasse123",
     "type_utilisateur": "patient",
     "age": 25,
@@ -24,7 +27,7 @@ TEST_PATIENT = {
 
 TEST_DOCTOR = {
     "nom": "Dr Paul Ewondo",
-    "telephone": "+237677987654",
+    "telephone": f"+237677{timestamp}",
     "mot_de_passe": "medecin123",
     "type_utilisateur": "medecin",
     "specialite": "Cardiologie",

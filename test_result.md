@@ -209,16 +209,19 @@ frontend:
         comment: "Navigation spécialités -> médecins avec tarifs fonctionnelle"
   
   - task: "Calendrier de réservation"
-    implemented: false
-    working: "NA"
-    file: "booking-calendar.tsx"
+    implemented: true
+    working: true
+    file: "booking/calendar.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "À implémenter - calendrier avec créneaux horaires"
+      - working: true
+        agent: "main"
+        comment: "Calendrier implémenté avec intégration API réelle pour les créneaux disponibles, sélection date/heure, confirmation de rendez-vous et redirection vers confirmation"
   
   - task: "Formulaire réservation patient"
     implemented: false

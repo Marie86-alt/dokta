@@ -684,6 +684,7 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: '#FFFFFF',
     marginBottom: 8,
+    zIndex: 1,
   },
   doctorCard: {
     flexDirection: 'row',

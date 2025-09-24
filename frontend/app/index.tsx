@@ -106,14 +106,15 @@ export default function Index() {
 
   const renderAccueilTab = () => (
     <ScrollView style={styles.tabContent} showsVerticalScrollIndicator={false}>
-      {/* Search Section */}
-      <View style={styles.searchSection}>
+      {/* Main Search Section - Style Doctolib */}
+      <View style={styles.mainSearchSection}>
         <View style={styles.searchContainer}>
+          <Text style={styles.searchTitle}>Trouvez et prenez rendez-vous avec un professionnel de santé</Text>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#666" />
             <TextInput
               style={styles.searchInput}
-              placeholder="Rechercher un médecin, une spécialité..."
+              placeholder="Spécialité, médecin, établissement..."
               placeholderTextColor="#999"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -133,7 +134,7 @@ export default function Index() {
             <View style={styles.searchResults}>
               {loading ? (
                 <View style={styles.searchLoading}>
-                  <Text>Recherche...</Text>
+                  <Text style={styles.loadingText}>Recherche...</Text>
                 </View>
               ) : (
                 searchResults.slice(0, 5).map((result) => (

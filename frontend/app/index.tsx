@@ -602,6 +602,7 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     fontSize: 16,
     color: '#333',
+    outlineStyle: 'none',
   },
   searchResults: {
     position: 'absolute',

@@ -670,6 +670,51 @@ async def update_user_profile(
     
     return {"message": "Profil mis à jour avec succès"}
 
+@api_router.post("/appointments")
+async def create_appointment(appointment_data: dict):
+    """Créer un nouveau rendez-vous"""
+    try:
+        # Générer un ID unique pour le rendez-vous
+        appointment_id = str(uuid.uuid4())
+        
+        # Créer l'objet rendez-vous
+        appointment = {
+            "id": appointment_id,
+            "doctor_id": appointment_data.get("doctor_id"),
+            "patient_name": appointment_data.get("patient_name"),
+            "patient_age": appointment_data.get("patient_age"),
+            "date": appointment_data.get("date"),
+            "time": appointment_data.get("time"),
+            "consultation_type": appointment_data.get("consultation_type"),
+            "price": appointment_data.get("price"),
+            "user_id": appointment_data.get("user_id"),
+            "status": "confirmed",
+            "created_at": datetime.utcnow().isoformat(),
+            "payment_status": "pending"
+        }
+        
+        # Vérifier que le créneau n'est pas déjà pris
+        existing = await db.appointments.find_one({
+            "doctor_id": appointment_data.get("doctor_id"),
+            "date": appointment_data.get("date"),
+            "time": appointment_data.get("time"),
+            "status": {"$ne": "cancelled"}
+        })
+        
+        if existing:
+            raise HTTPException(status_code=409, detail="Ce créneau est déjà réservé")
+        
+        # Insérer le rendez-vous
+        await db.appointments.insert_one(appointment)
+        
+        return {"id": appointment_id, "status": "confirmed", "message": "Rendez-vous créé avec succès"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Erreur création rendez-vous: {e}")
+        raise HTTPException(status_code=500, detail="Erreur lors de la création du rendez-vous")
+
 # Include the router in the main app
 app.include_router(api_router)
 

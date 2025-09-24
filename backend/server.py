@@ -179,7 +179,12 @@ async def get_available_slots(doctor_id: str, date: str):
         "status": {"$ne": AppointmentStatus.CANCELLED}
     }).to_list(100)
     
-    taken_times = [appt["heure"] for appt in taken_appointments]
+    taken_times = []
+    for appt in taken_appointments:
+        # Handle both 'heure' and 'time' fields for backward compatibility
+        time_value = appt.get("heure") or appt.get("time")
+        if time_value:
+            taken_times.append(time_value)
     
     # Retourner les créneaux disponibles
     available_slots = [

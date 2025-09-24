@@ -478,6 +478,27 @@ const styles = StyleSheet.create({
   tabContent: {
     flex: 1,
   },
+  // Hero Section Style Doctolib
+  heroSection: {
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 20,
+    paddingVertical: 32,
+    marginBottom: 8,
+  },
+  heroTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: '#333',
+    textAlign: 'center',
+    marginBottom: 8,
+    lineHeight: 32,
+  },
+  heroSubtitle: {
+    fontSize: 16,
+    color: '#666',
+    textAlign: 'center',
+    marginBottom: 24,
+  },
   searchSection: {
     backgroundColor: '#2E8B57',
     paddingHorizontal: 16,
@@ -489,15 +510,17 @@ const styles = StyleSheet.create({
   searchBar: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 25,
+    backgroundColor: '#F8F9FA',
+    borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 14,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowRadius: 4,
+    elevation: 3,
   },
   searchInput: {
     flex: 1,

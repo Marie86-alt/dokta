@@ -271,7 +271,7 @@ class DOKTABackendTester:
                 "patient_name": "Patient Test 1",
                 "patient_age": 30,
                 "date": "2024-12-27",
-                "time": "10:00",
+                "time": "15:00",  # Changed to a different time slot
                 "consultation_type": "cabinet",
                 "price": 15000,
                 "user_id": "test_user_1"
@@ -305,7 +305,7 @@ class DOKTABackendTester:
                     self.log_test("Double Booking Prevention", False, "Double réservation autorisée à tort")
                     return False
             else:
-                self.log_test("Double Booking Prevention", False, "Impossible de créer le premier rendez-vous")
+                self.log_test("Double Booking Prevention", False, f"Impossible de créer le premier rendez-vous: {response1.status_code}")
                 return False
                 
         except Exception as e:

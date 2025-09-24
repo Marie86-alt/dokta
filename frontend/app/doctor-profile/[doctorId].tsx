@@ -93,11 +93,18 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
   };
 
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
+    console.log(`Clic sur ${type}, doctor:`, doctor);
+    
     if (!user) {
       Alert.alert('Connexion requise', 'Veuillez vous connecter pour prendre rendez-vous', [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Se connecter', onPress: () => router.push('/login') }
       ]);
+      return;
+    }
+
+    if (!doctor) {
+      Alert.alert('Erreur', 'Informations médecin non disponibles');
       return;
     }
 
@@ -109,15 +116,15 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
           params: { 
             doctorId: doctorId as string,
             consultationType: 'cabinet',
-            doctorName: doctor?.nom || '',
-            price: doctor?.tarif || 0
+            doctorName: doctor.nom,
+            price: doctor.tarif.toString()
           }
         });
         break;
       case 'domicile':
         Alert.alert(
           'Consultation à domicile',
-          `Tarif : ${formatPrice((doctor?.tarif || 0) + 5000)} (+ 5000 FCFA frais de déplacement)\n\nConfirmer la demande ?`,
+          `Tarif : ${formatPrice(doctor.tarif + 5000)} (+ 5000 FCFA frais de déplacement)\n\nConfirmer la demande ?`,
           [
             { text: 'Annuler', style: 'cancel' },
             { text: 'Confirmer', onPress: () => 
@@ -126,8 +133,8 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
                 params: { 
                   doctorId: doctorId as string,
                   consultationType: 'domicile',
-                  doctorName: doctor?.nom || '',
-                  price: (doctor?.tarif || 0) + 5000
+                  doctorName: doctor.nom,
+                  price: (doctor.tarif + 5000).toString()
                 }
               })
             }
@@ -137,7 +144,7 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
       case 'teleconsultation':
         Alert.alert(
           'Téléconsultation',
-          `Tarif : ${formatPrice((doctor?.tarif || 0) - 2000)} (-2000 FCFA en ligne)\n\nConfirmer la demande ?`,
+          `Tarif : ${formatPrice(doctor.tarif - 2000)} (-2000 FCFA en ligne)\n\nConfirmer la demande ?`,
           [
             { text: 'Annuler', style: 'cancel' },
             { text: 'Confirmer', onPress: () =>
@@ -146,8 +153,8 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
                 params: { 
                   doctorId: doctorId as string,
                   consultationType: 'teleconsultation',
-                  doctorName: doctor?.nom || '',
-                  price: (doctor?.tarif || 0) - 2000
+                  doctorName: doctor.nom,
+                  price: (doctor.tarif - 2000).toString()
                 }
               })
             }

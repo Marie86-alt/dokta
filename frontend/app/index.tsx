@@ -293,8 +293,31 @@ export default function Index() {
         {tabName === 'compte' && 'Mon Compte'}
       </Text>
       <Text style={styles.comingSoonText}>
-        Cette section sera bientôt disponible
+        {tabName === 'compte' 
+          ? 'Connectez-vous pour accéder à votre compte'
+          : 'Cette section sera bientôt disponible'
+        }
       </Text>
+      
+      {tabName === 'compte' && (
+        <View style={styles.accountActions}>
+          <TouchableOpacity 
+            style={styles.loginButton}
+            onPress={() => Alert.alert('Connexion Patient', 'Fonctionnalité bientôt disponible')}
+          >
+            <Ionicons name="person" size={20} color="#FFFFFF" />
+            <Text style={styles.loginButtonText}>Se connecter</Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity 
+            style={styles.registerButton}
+            onPress={() => Alert.alert('Inscription Patient', 'Fonctionnalité bientôt disponible')}
+          >
+            <Ionicons name="person-add" size={20} color="#2E8B57" />
+            <Text style={styles.registerButtonText}>Créer un compte</Text>
+          </TouchableOpacity>
+        </View>
+      )}
     </View>
   );
 

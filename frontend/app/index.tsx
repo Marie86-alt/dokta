@@ -623,6 +623,13 @@ const styles = StyleSheet.create({
     color: '#333',
     marginBottom: 16,
   },
+  sectionTitleCentered: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 16,
+    textAlign: 'center',
+  },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',

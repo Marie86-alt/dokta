@@ -838,6 +838,67 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2E8B57',
   },
+  // Styles pour le profil utilisateur connecté
+  userProfile: {
+    width: '100%',
+  },
+  profileInfo: {
+    backgroundColor: '#FFFFFF',
+    padding: 20,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+    borderLeftColor: '#2E8B57',
+  },
+  profileName: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#333',
+    marginBottom: 4,
+  },
+  profilePhone: {
+    fontSize: 16,
+    color: '#2E8B57',
+    fontWeight: '500',
+    marginBottom: 8,
+  },
+  profileType: {
+    fontSize: 14,
+    color: '#666',
+  },
+  profileButton: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#2E8B57',
+    marginBottom: 12,
+    gap: 8,
+  },
+  profileButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E8B57',
+  },
+  logoutButton: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E74C3C',
+    gap: 8,
+  },
+  logoutButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#E74C3C',
+  },
   // Bouton flottant médecin
   doctorFloatingButton: {
     position: 'absolute',

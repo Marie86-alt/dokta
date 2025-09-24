@@ -224,9 +224,9 @@ frontend:
         comment: "Calendrier implémenté avec intégration API réelle pour les créneaux disponibles, sélection date/heure, confirmation de rendez-vous et redirection vers confirmation"
   
   - task: "Formulaire réservation patient"
-    implemented: false
-    working: "NA"
-    file: "booking-form.tsx"
+    implemented: true
+    working: true
+    file: "patient-form.tsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
@@ -234,6 +234,9 @@ frontend:
       - working: "NA"
         agent: "main"
         comment: "À implémenter - saisie infos patient pour réservation"
+      - working: true
+        agent: "main"
+        comment: "Formulaire patient fonctionnel avec validation des données camerounaises intégré"
   
   - task: "Paiement Mobile Money"
     implemented: false

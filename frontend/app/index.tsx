@@ -430,6 +430,14 @@ export default function Index() {
           </Text>
         </TouchableOpacity>
       </View>
+
+      {/* Floating Doctor Button */}
+      <TouchableOpacity
+        style={styles.doctorFloatingButton}
+        onPress={() => router.push('/doctor-login')}
+      >
+        <Ionicons name="medical" size={24} color="#FFFFFF" />
+      </TouchableOpacity>
     </SafeAreaView>
   );
 }

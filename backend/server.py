@@ -707,13 +707,48 @@ async def create_appointment(appointment_data: dict):
         # Insérer le rendez-vous
         await db.appointments.insert_one(appointment)
         
-        return {"id": appointment_id, "status": "confirmed", "message": "Rendez-vous créé avec succès"}
+        return {
+            "id": appointment_id, 
+            "status": "confirmed", 
+            "message": "Rendez-vous créé avec succès",
+            "appointment": appointment
+        }
         
     except HTTPException:
         raise
     except Exception as e:
         print(f"Erreur création rendez-vous: {e}")
         raise HTTPException(status_code=500, detail="Erreur lors de la création du rendez-vous")
+
+from fastapi import Request
+
+@api_router.post("/appointments-simple")
+async def create_appointment_simple(request: Request):
+    """Créer un nouveau rendez-vous - version simplifiée"""
+    try:
+        appointment_data = await request.json()
+        print(f"Données reçues: {appointment_data}")
+        
+        # Générer un ID unique pour le rendez-vous
+        appointment_id = str(uuid.uuid4())
+        
+        # Créer l'objet rendez-vous
+        appointment = {
+            "id": appointment_id,
+            **appointment_data,
+            "status": "confirmed",
+            "created_at": datetime.utcnow().isoformat(),
+            "payment_status": "pending"
+        }
+        
+        # Insérer le rendez-vous
+        await db.appointments.insert_one(appointment)
+        
+        return {"id": appointment_id, "status": "confirmed"}
+        
+    except Exception as e:
+        print(f"Erreur création rendez-vous: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
 
 # Include the router in the main app
 app.include_router(api_router)

@@ -503,7 +503,7 @@ async def register_user(user_data: UserRegistration):
         )
     
     # Vérifier si l'utilisateur existe déjà
-    existing_user = await db.users.find_one({"telephone": user_data.telephone})
+    existing_user = await db.users.find_one({"telephone": user_data.telephone}, {"_id": 0})
     if existing_user:
         raise HTTPException(
             status_code=400,

@@ -426,13 +426,15 @@ async def global_search(q: str):
         for doctor in doctors:
             if (query_lower in doctor["nom"].lower() or 
                 query_lower in doctor["specialite"].lower()):
+                # Convert to Doctor model to handle serialization
+                doctor_obj = Doctor(**doctor)
                 results.append({
                     "id": doctor["id"],
                     "type": "doctor",
                     "title": doctor["nom"],
                     "subtitle": doctor["specialite"],
                     "metadata": f"{doctor['tarif']:,} FCFA • {doctor['experience']}",
-                    "data": doctor
+                    "data": doctor_obj.dict()
                 })
         
         # Recherche des spécialités

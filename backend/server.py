@@ -490,9 +490,6 @@ async def global_search(q: str):
         print(f"Erreur de recherche: {e}")
         return {"results": []}
 
-# Include the router in the main app
-app.include_router(api_router)
-
 # Routes d'authentification
 @api_router.post("/auth/register", response_model=Token)
 async def register_user(user_data: UserRegistration):
@@ -664,6 +661,9 @@ async def update_user_profile(
         )
     
     return {"message": "Profil mis à jour avec succès"}
+
+# Include the router in the main app
+app.include_router(api_router)
 
 app.add_middleware(
     CORSMiddleware,

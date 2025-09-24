@@ -239,16 +239,19 @@ frontend:
         comment: "Formulaire patient fonctionnel avec validation des données camerounaises intégré"
   
   - task: "Paiement Mobile Money"
-    implemented: false
-    working: "NA"
-    file: "payment.tsx"
+    implemented: true
+    working: true
+    file: "mobile-money-payment.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
         comment: "À implémenter - intégration MTN/Orange Money"
+      - working: true
+        agent: "main"
+        comment: "Paiement Mobile Money simulé implémenté avec interface utilisateur complète MTN/Orange Money, validation des numéros camerounais et processus de paiement étape par étape"
 
 metadata:
   created_by: "main_agent"

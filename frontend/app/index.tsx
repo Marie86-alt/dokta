@@ -205,7 +205,7 @@ export default function Index() {
           <TouchableOpacity
             key={doctor.id}
             style={styles.doctorCard}
-            onPress={() => router.push(`/booking/${doctor.id}`)}
+            onPress={() => router.push(`/doctor-profile/${doctor.id}`)}
           >
             <View style={styles.doctorAvatar}>
               <Ionicons name="person-circle" size={50} color="#2E8B57" />

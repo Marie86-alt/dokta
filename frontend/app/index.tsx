@@ -46,6 +46,9 @@ export default function Index() {
   const [featuredDoctors, setFeaturedDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
 
+  // Utiliser le contexte d'authentification
+  const { user, logout } = useAuth();
+
   useEffect(() => {
     fetchInitialData();
   }, []);

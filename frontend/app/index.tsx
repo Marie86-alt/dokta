@@ -541,6 +541,7 @@ const styles = StyleSheet.create({
   },
   searchContainer: {
     position: 'relative',
+    zIndex: 1000,
   },
   searchBar: {
     flexDirection: 'row',

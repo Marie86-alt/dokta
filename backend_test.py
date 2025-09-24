@@ -319,7 +319,7 @@ class DOKTABackendTester:
             
         try:
             test_date = "2024-12-27"
-            test_time = "11:00"
+            test_time = "16:00"  # Changed to a different time slot
             
             # 1. Vérifier créneaux disponibles AVANT
             slots_before = requests.get(f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}")

@@ -333,6 +333,136 @@ class MediBookTester:
             self.log_result("Slot Unavailable After Booking", False, f"Erreur: {str(e)}")
             return False
     
+    def test_global_search(self):
+        """Test API de recherche globale"""
+        try:
+            # Test recherche médecin
+            response = requests.get(f"{BACKEND_URL}/search?q=Marie", headers=HEADERS, timeout=10)
+            if response.status_code == 200:
+                results = response.json().get('results', [])
+                doctor_results = [r for r in results if r.get('type') == 'doctor']
+                if doctor_results:
+                    self.log_result("Global Search - Doctors", True, f"{len(doctor_results)} médecins trouvés pour 'Marie'")
+                else:
+                    self.log_result("Global Search - Doctors", False, "Aucun médecin trouvé pour 'Marie'")
+            else:
+                self.log_result("Global Search - Doctors", False, f"Status code: {response.status_code}", response.text)
+
+            # Test recherche spécialité
+            response = requests.get(f"{BACKEND_URL}/search?q=Cardio", headers=HEADERS, timeout=10)
+            if response.status_code == 200:
+                results = response.json().get('results', [])
+                specialty_results = [r for r in results if r.get('type') == 'specialty']
+                if specialty_results:
+                    self.log_result("Global Search - Specialties", True, f"{len(specialty_results)} spécialités trouvées pour 'Cardio'")
+                    return True
+                else:
+                    self.log_result("Global Search - Specialties", False, "Aucune spécialité trouvée pour 'Cardio'")
+                    return False
+            else:
+                self.log_result("Global Search - Specialties", False, f"Status code: {response.status_code}", response.text)
+                return False
+
+        except Exception as e:
+            self.log_result("Global Search", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_doctor_dashboard(self):
+        """Test tableau de bord médecin"""
+        if not self.doctor_id:
+            self.log_result("Doctor Dashboard", False, "doctor_id manquant")
+            return False
+        
+        try:
+            response = requests.get(f"{BACKEND_URL}/doctors/{self.doctor_id}/dashboard", 
+                                  headers=HEADERS, 
+                                  timeout=10)
+            if response.status_code == 200:
+                dashboard = response.json()
+                if 'doctor' in dashboard and 'stats' in dashboard:
+                    stats = dashboard['stats']
+                    required_stats = ['total_appointments', 'today_appointments', 'confirmed_appointments', 'pending_appointments']
+                    missing_stats = [stat for stat in required_stats if stat not in stats]
+                    
+                    if not missing_stats:
+                        self.log_result("Doctor Dashboard", True, 
+                                      f"Stats: {stats['total_appointments']} total, {stats['today_appointments']} aujourd'hui")
+                        return True
+                    else:
+                        self.log_result("Doctor Dashboard", False, f"Stats manquantes: {missing_stats}")
+                        return False
+                else:
+                    self.log_result("Doctor Dashboard", False, f"Structure incorrecte: {list(dashboard.keys())}")
+                    return False
+            else:
+                self.log_result("Doctor Dashboard", False, f"Status code: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_result("Doctor Dashboard", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_doctor_appointments(self):
+        """Test récupération des rendez-vous du médecin"""
+        if not self.doctor_id:
+            self.log_result("Doctor Appointments", False, "doctor_id manquant")
+            return False
+        
+        try:
+            response = requests.get(f"{BACKEND_URL}/doctors/{self.doctor_id}/appointments", 
+                                  headers=HEADERS, 
+                                  timeout=10)
+            if response.status_code == 200:
+                appointments = response.json()
+                if appointments:
+                    # Vérifier que les rendez-vous ont les données patient
+                    first_appt = appointments[0]
+                    if 'patient' in first_appt and first_appt['patient']:
+                        self.log_result("Doctor Appointments", True, 
+                                      f"{len(appointments)} rendez-vous trouvés avec données patient")
+                        return True
+                    else:
+                        self.log_result("Doctor Appointments", False, 
+                                      "Données patient manquantes dans les rendez-vous")
+                        return False
+                else:
+                    self.log_result("Doctor Appointments", True, 
+                                  "Aucun rendez-vous (normal pour nouveau médecin)")
+                    return True
+            else:
+                self.log_result("Doctor Appointments", False, f"Status code: {response.status_code}", response.text)
+                return False
+        except Exception as e:
+            self.log_result("Doctor Appointments", False, f"Erreur: {str(e)}")
+            return False
+    
+    def test_error_handling(self):
+        """Test gestion d'erreurs avec IDs invalides"""
+        try:
+            # Test avec ID médecin invalide
+            response = requests.get(f"{BACKEND_URL}/doctors/invalid-id/available-slots?date={TEST_DATE}", 
+                                  headers=HEADERS, 
+                                  timeout=10)
+            if response.status_code == 404:
+                self.log_result("Error Handling - Invalid Doctor ID", True, "Erreur 404 correctement retournée")
+            else:
+                self.log_result("Error Handling - Invalid Doctor ID", False, f"Status code: {response.status_code}")
+            
+            # Test avec date invalide
+            response = requests.get(f"{BACKEND_URL}/doctors/{self.doctor_id}/available-slots?date=invalid-date", 
+                                  headers=HEADERS, 
+                                  timeout=10)
+            # L'API devrait gérer gracieusement les dates invalides
+            if response.status_code in [200, 400, 422]:
+                self.log_result("Error Handling - Invalid Date", True, f"Date invalide gérée (status: {response.status_code})")
+                return True
+            else:
+                self.log_result("Error Handling - Invalid Date", False, f"Status code inattendu: {response.status_code}")
+                return False
+                
+        except Exception as e:
+            self.log_result("Error Handling", False, f"Erreur: {str(e)}")
+            return False
+    
     def run_all_tests(self):
         """Exécuter tous les tests dans l'ordre"""
         print("=" * 60)

@@ -735,4 +735,58 @@ const styles = StyleSheet.create({
   tabTextActive: {
     color: '#2E8B57',
   },
+  // Styles pour l'onglet Compte
+  accountActions: {
+    paddingHorizontal: 16,
+    marginTop: 24,
+  },
+  loginButton: {
+    backgroundColor: '#2E8B57',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    gap: 8,
+  },
+  loginButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#FFFFFF',
+  },
+  registerButton: {
+    backgroundColor: '#FFFFFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#2E8B57',
+    marginBottom: 24,
+    gap: 8,
+  },
+  registerButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#2E8B57',
+  },
+  // Bouton flottant médecin
+  doctorFloatingButton: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    backgroundColor: '#2E8B57',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 8,
+  },
 });

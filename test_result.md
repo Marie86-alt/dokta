@@ -171,6 +171,18 @@ backend:
         agent: "testing"
         comment: "API tableau de bord médecin testée avec succès: statistiques complètes (total_appointments, today_appointments, confirmed_appointments, pending_appointments), données médecin incluses. API rendez-vous médecin avec données patient enrichies fonctionne parfaitement."
 
+  - task: "Système d'authentification JWT"
+    implemented: true
+    working: true
+    file: "server.py, auth.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tests complets d'authentification réussis (14/14 - 100%): ✅ API Root, ✅ Inscription Patient Camerounais (+237699XXXXXX), ✅ Inscription Médecin avec Spécialité/Tarifs, ✅ Validation Numéros Camerounais Invalides (6/6 rejetés), ✅ Prévention Doublons, ✅ Connexion Patient/Médecin, ✅ Échec Mauvais Credentials, ✅ Profil avec Token Valide, ✅ Échec sans Token/Token Invalide, ✅ Mise à jour Profil Patient/Médecin, ✅ Protection Champs Interdits. Système JWT sécurisé et fonctionnel avec validation camerounaise opérationnelle."
+
 frontend:
   - task: "Interface accueil Patient/Médecin"
     implemented: true

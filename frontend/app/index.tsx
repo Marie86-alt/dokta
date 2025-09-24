@@ -165,7 +165,7 @@ export default function Index() {
 
       {/* Quick Actions */}
       <View style={styles.quickActionsSection}>
-        <Text style={styles.sectionTitle}>Services rapides</Text>
+        <Text style={styles.sectionTitleCentered}>Services rapides</Text>
         <View style={styles.quickActionsGrid}>
           <TouchableOpacity
             style={styles.quickActionCard}
@@ -177,21 +177,17 @@ export default function Index() {
             <Text style={styles.quickActionText}>Prendre RDV</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickActionCard}>
+          <TouchableOpacity 
+            style={styles.quickActionCard}
+            onPress={() => Alert.alert('Urgences', 'Service d\'urgence bientôt disponible')}
+          >
             <View style={[styles.quickActionIcon, { backgroundColor: '#FFE8E8' }]}>
               <Ionicons name="medical" size={24} color="#E74C3C" />
             </View>
             <Text style={styles.quickActionText}>Urgences</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.quickActionCard}>
-            <View style={[styles.quickActionIcon, { backgroundColor: '#E8F4FD' }]}>
-              <Ionicons name="videocam" size={24} color="#3498DB" />
-            </View>
-            <Text style={styles.quickActionText}>Téléconsult.</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
+          <TouchableOpacity 
             style={styles.quickActionCard}
             onPress={() => setActiveTab('documents')}
           >
@@ -199,6 +195,16 @@ export default function Index() {
               <Ionicons name="document-text" size={24} color="#9B59B6" />
             </View>
             <Text style={styles.quickActionText}>Documents</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.quickActionCard}
+            onPress={() => setActiveTab('messages')}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: '#E8F4FD' }]}>
+              <Ionicons name="chatbubbles" size={24} color="#3498DB" />
+            </View>
+            <Text style={styles.quickActionText}>Messages</Text>
           </TouchableOpacity>
         </View>
       </View>

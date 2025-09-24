@@ -330,10 +330,13 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <Text style={styles.appTitle}>DOKTA</Text>
-          <Text style={styles.appSubtitle}>Santé digitale - Cameroun</Text>
+          <Text style={styles.appSubtitle}>Votre santé en quelques clics</Text>
         </View>
-        <TouchableOpacity style={styles.headerButton}>
-          <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
+        <TouchableOpacity 
+          style={styles.headerButton}
+          onPress={() => router.push('/doctor-login')}
+        >
+          <Ionicons name="medical" size={24} color="#FFFFFF" />
         </TouchableOpacity>
       </View>
 

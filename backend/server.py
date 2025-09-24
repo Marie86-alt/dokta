@@ -132,6 +132,18 @@ async def create_doctor(doctor: DoctorCreate):
     await db.doctors.insert_one(doctor_obj.dict())
     return doctor_obj
 
+@api_router.get("/doctors/{doctor_id}")
+async def get_doctor_by_id(doctor_id: str):
+    """Récupérer un médecin par son ID"""
+    try:
+        doctor = await db.doctors.find_one({"id": doctor_id}, {"_id": 0})
+        if not doctor:
+            raise HTTPException(status_code=404, detail="Médecin non trouvé")
+        return doctor
+    except Exception as e:
+        print(f"Erreur récupération médecin {doctor_id}: {e}")
+        raise HTTPException(status_code=500, detail="Erreur serveur")
+
 @api_router.get("/doctors", response_model=List[Doctor])
 async def get_doctors(specialite: Optional[SpecialtyType] = None):
     query = {"disponible": True}

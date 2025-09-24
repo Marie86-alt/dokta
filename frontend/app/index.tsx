@@ -297,7 +297,7 @@ export default function Index() {
         color="#CCC"
       />
       <Text style={styles.comingSoonTitle}>
-        {tabName === 'rendez-vous' && 'Mes Rendez-vous'}
+        {tabName === 'rendez-vous' && 'Prendre Rendez-vous'}
         {tabName === 'documents' && 'Mes Documents'}
         {tabName === 'messages' && 'Messages'}
         {tabName === 'compte' && (user ? `Profil de ${user.nom}` : 'Mon Compte')}
@@ -305,9 +305,39 @@ export default function Index() {
       <Text style={styles.comingSoonText}>
         {tabName === 'compte' 
           ? (user ? 'Gérez votre profil et vos informations' : 'Connectez-vous pour accéder à votre compte')
+          : tabName === 'rendez-vous'
+          ? 'Choisissez votre type de consultation'
           : 'Cette section sera bientôt disponible'
         }
       </Text>
+      
+      {tabName === 'rendez-vous' && (
+        <View style={styles.rdvActions}>
+          <TouchableOpacity 
+            style={styles.consultationChoiceButton}
+            onPress={() => router.push('/consultation-choice')}
+          >
+            <Ionicons name="medical" size={20} color="#FFFFFF" />
+            <Text style={styles.consultationChoiceButtonText}>Choisir le type de consultation</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.consultationTypes}>
+            <Text style={styles.consultationTypesTitle}>Types disponibles :</Text>
+            <View style={styles.consultationType}>
+              <Ionicons name="business" size={16} color="#2E8B57" />
+              <Text style={styles.consultationTypeText}>Consultation au cabinet</Text>
+            </View>
+            <View style={styles.consultationType}>
+              <Ionicons name="home" size={16} color="#F39C12" />
+              <Text style={styles.consultationTypeText}>Consultation à domicile</Text>
+            </View>
+            <View style={styles.consultationType}>
+              <Ionicons name="videocam" size={16} color="#3498DB" />
+              <Text style={styles.consultationTypeText}>Téléconsultation</Text>
+            </View>
+          </View>
+        </View>
+      )}
       
       {tabName === 'compte' && (
         <View style={styles.accountActions}>

@@ -546,6 +546,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  searchPlaceholder: {
+    flex: 1,
+    marginLeft: 12,
+    fontSize: 16,
+    color: '#999',
+  },
   section: {
     marginBottom: 24,
   },

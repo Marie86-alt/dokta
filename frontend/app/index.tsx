@@ -563,7 +563,7 @@ const styles = StyleSheet.create({
   },
   searchResults: {
     position: 'absolute',
-    top: 50,
+    top: 70,
     left: 0,
     right: 0,
     backgroundColor: '#FFFFFF',

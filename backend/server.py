@@ -553,7 +553,8 @@ async def register_user(user_data: UserRegistration):
             "telephone": user_data.telephone,
             "created_at": datetime.utcnow().isoformat()
         }
-        await db.doctors.insert_one(doctor_dict)
+        result = await db.doctors.insert_one(doctor_dict)
+        print(f"Doctor inserted with _id: {result.inserted_id}")
     
     # Insérer l'utilisateur
     await db.users.insert_one(user_dict)

@@ -55,17 +55,15 @@ export default function PatientForm() {
     }
 
     router.push({
-      pathname: '/payment',
+      pathname: '/mobile-money-payment',
       params: {
-        doctorId: doctorId as string,
+        appointmentId: 'temp-id', // Sera remplacé par l'ID réel après création
         doctorName: doctorName as string,
-        specialite: specialite as string,
-        tarif: tarif as string,
+        patientName: patientInfo.nom,
         date: date as string,
         time: time as string,
-        patientNom: patientInfo.nom,
-        patientTelephone: patientInfo.telephone,
-        motif: patientInfo.motif
+        consultationType: 'cabinet', // Type par défaut
+        price: tarif as string,
       }
     });
   };

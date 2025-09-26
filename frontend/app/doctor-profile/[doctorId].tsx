@@ -30,7 +30,7 @@ interface Doctor {
 
 export default function DoctorProfileScreen() {
   const { doctorId } = useLocalSearchParams();
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Commenté temporairement
   const [doctor, setDoctor] = useState<Doctor | null>(null);
   const [loading, setLoading] = useState(true);
 

@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { Calendar } from 'react-native-calendars';
 import { router, useLocalSearchParams } from 'expo-router';
 // import { useAuth } from '../../contexts/AuthContext'; // Commenté temporairement
+import NotificationService from '../../services/notificationService';
 
 interface TimeSlot {
   time: string;

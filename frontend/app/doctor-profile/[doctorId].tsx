@@ -595,6 +595,7 @@ const styles = StyleSheet.create({
   consultationSection: {
     paddingHorizontal: 16,
     marginBottom: 32,
+    zIndex: 1,
   },
   consultationTitle: {
     fontSize: 18,

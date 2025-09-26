@@ -332,7 +332,12 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
 
           <TouchableOpacity 
             style={styles.consultationCard}
-            onPress={() => handleConsultationType('teleconsultation')}
+            onPress={() => {
+              console.log('CLICK DÉTECTÉ sur teleconsultation');
+              Alert.alert('Test', 'Bouton téléconsultation cliqué !');
+              handleConsultationType('teleconsultation');
+            }}
+            activeOpacity={0.7}
           >
             <View style={styles.consultationHeader}>
               <View style={[styles.consultationIcon, { backgroundColor: '#E8F4FD' }]}>

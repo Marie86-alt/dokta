@@ -93,63 +93,18 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
   };
 
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
-    console.log(`Clic sur ${type}, doctor:`, doctor);
-    // console.log('User context:', user); // Commenté temporairement
-
-    if (!doctor) {
-      console.log('Pas d\'informations médecin disponibles');
-      return;
-    }
-
-    // Test navigation direct sans vérification d'authentification
-    console.log('Navigation vers patient-selection...');
-    console.log('Doctor tarif:', doctor.tarif);
-    console.log('Doctor nom:', doctor.nom);
+    console.log('=== DÉBUT DE FONCTION ===');
+    console.log('Type:', type);
     
     try {
-      switch (type) {
-        case 'cabinet':
-          console.log('Cas cabinet - avant navigation');
-          router.push({
-            pathname: '/patient-selection',
-            params: { 
-              doctorId: doctorId as string,
-              consultationType: 'cabinet',
-              doctorName: doctor.nom,
-              price: doctor.tarif.toString()
-            }
-          });
-          console.log('Cas cabinet - après navigation');
-          break;
-        case 'domicile':
-          console.log('Cas domicile - avant navigation');
-          router.push({
-            pathname: '/patient-selection',
-            params: { 
-              doctorId: doctorId as string,
-              consultationType: 'domicile',
-              doctorName: doctor.nom,
-              price: (doctor.tarif + 5000).toString()
-            }
-          });
-          console.log('Cas domicile - après navigation');
-          break;
-        case 'teleconsultation':
-          console.log('Cas teleconsultation - avant navigation');
-          router.push({
-            pathname: '/patient-selection',
-            params: { 
-              doctorId: doctorId as string,
-              consultationType: 'teleconsultation',
-              doctorName: doctor.nom,
-              price: (doctor.tarif - 2000).toString()
-            }
-          });
-          console.log('Cas teleconsultation - après navigation');
-          break;
-      }
+      console.log('=== AVANT NAVIGATION ===');
+      
+      // Navigation ultra simple pour test
+      router.push('/patient-selection');
+      
+      console.log('=== APRÈS NAVIGATION ===');
     } catch (error) {
-      console.error('Erreur navigation:', error);
+      console.error('=== ERREUR ===', error);
     }
   };
 

@@ -205,7 +205,10 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
       <View style={styles.header}>
         <TouchableOpacity 
           style={styles.headerBackButton}
-          onPress={() => router.back()}
+          onPress={() => {
+            console.log('CLICK RETOUR DÉTECTÉ');
+            router.back();
+          }}
         >
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />
         </TouchableOpacity>

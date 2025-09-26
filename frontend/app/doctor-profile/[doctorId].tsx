@@ -210,7 +210,7 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
           style={styles.headerBackButton}
           onPress={() => {
             console.log('CLICK RETOUR DÉTECTÉ');
-            router.back();
+            router.push('/');
           }}
         >
           <Ionicons name="arrow-back" size={24} color="#FFFFFF" />

@@ -159,22 +159,28 @@ export default function BookingCalendarScreen() {
   };
 
   const handleConfirmBooking = async () => {
+    console.log('=== DÉBUT CONFIRMATION RDV ===');
+    console.log('selectedDate:', selectedDate);
+    console.log('selectedTime:', selectedTime);
+    
     if (!selectedDate || !selectedTime) {
+      console.log('❌ Sélection incomplète');
       Alert.alert('Sélection incomplète', 'Veuillez sélectionner une date et un horaire');
       return;
     }
 
     try {
+      console.log('✅ Début du processus de réservation...');
       setLoading(true);
 
       // Demander les permissions de notifications lors de la première réservation
       let notificationToken = null;
       try {
-        console.log('Demande de permissions de notifications...');
+        console.log('📱 Demande de permissions de notifications...');
         notificationToken = await NotificationService.registerForPushNotifications();
         
         if (notificationToken) {
-          console.log('Token de notification obtenu:', notificationToken);
+          console.log('✅ Token de notification obtenu:', notificationToken);
           
           // Enregistrer le token sur le serveur
           await NotificationService.registerTokenWithBackend('anonymous', notificationToken);
@@ -188,13 +194,14 @@ export default function BookingCalendarScreen() {
             [{ text: 'Parfait !', style: 'default' }]
           );
         } else {
-          console.log('Permissions de notifications refusées ou non disponibles');
+          console.log('⚠️ Permissions de notifications refusées ou non disponibles');
         }
       } catch (notifError) {
-        console.error('Erreur notifications:', notifError);
+        console.error('❌ Erreur notifications:', notifError);
         // Continue sans notifications
       }
       
+      console.log('📋 Préparation des données de réservation...');
       const bookingData = {
         doctor_id: doctorId,
         patient_name: patientName,
@@ -207,7 +214,7 @@ export default function BookingCalendarScreen() {
         notification_token: notificationToken, // Inclure le token pour le backend
       };
 
-      console.log('Données de réservation:', bookingData);
+      console.log('📤 Données de réservation:', bookingData);
 
       const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/appointments-simple`, {
         method: 'POST',
@@ -217,17 +224,19 @@ export default function BookingCalendarScreen() {
         body: JSON.stringify(bookingData),
       });
 
+      console.log('📨 Réponse API status:', response.status);
+
       if (response.ok) {
         const appointment = await response.json();
-        console.log('Rendez-vous créé:', appointment);
+        console.log('✅ Rendez-vous créé:', appointment);
         
         // Programmer une notification de test pour démonstration
         if (notificationToken) {
           try {
             await NotificationService.scheduleTestNotification(10); // Test dans 10 secondes
-            console.log('Notification de test programmée');
+            console.log('⏰ Notification de test programmée');
           } catch (testError) {
-            console.error('Erreur notification test:', testError);
+            console.error('❌ Erreur notification test:', testError);
           }
         }
         
@@ -240,6 +249,7 @@ export default function BookingCalendarScreen() {
             {
               text: 'OK',
               onPress: () => {
+                console.log('🔄 Navigation vers confirmation...');
                 router.push({
                   pathname: '/booking-confirmation',
                   params: {
@@ -258,13 +268,14 @@ export default function BookingCalendarScreen() {
         );
       } else {
         const errorData = await response.text();
-        console.error('Erreur API:', errorData);
+        console.error('❌ Erreur API:', errorData);
         throw new Error('Erreur lors de la réservation');
       }
     } catch (error) {
-      console.error('Erreur réservation:', error);
+      console.error('💥 Erreur réservation:', error);
       Alert.alert('Erreur', 'Impossible de confirmer le rendez-vous. Veuillez réessayer.');
     } finally {
+      console.log('🔚 Fin du processus - setLoading(false)');
       setLoading(false);
     }
   };

@@ -166,6 +166,34 @@ export default function BookingCalendarScreen() {
 
     try {
       setLoading(true);
+
+      // Demander les permissions de notifications lors de la première réservation
+      let notificationToken = null;
+      try {
+        console.log('Demande de permissions de notifications...');
+        notificationToken = await NotificationService.registerForPushNotifications();
+        
+        if (notificationToken) {
+          console.log('Token de notification obtenu:', notificationToken);
+          
+          // Enregistrer le token sur le serveur
+          await NotificationService.registerTokenWithBackend('anonymous', notificationToken);
+          
+          // Configurer les gestionnaires de notifications
+          NotificationService.setupNotificationHandlers();
+          
+          Alert.alert(
+            'Notifications activées 🔔',
+            'Vous recevrez un rappel 1h avant votre rendez-vous avec l\'itinéraire.',
+            [{ text: 'Parfait !', style: 'default' }]
+          );
+        } else {
+          console.log('Permissions de notifications refusées ou non disponibles');
+        }
+      } catch (notifError) {
+        console.error('Erreur notifications:', notifError);
+        // Continue sans notifications
+      }
       
       const bookingData = {
         doctor_id: doctorId,
@@ -176,6 +204,7 @@ export default function BookingCalendarScreen() {
         consultation_type: consultationType,
         price: parseInt(price as string),
         user_id: 'anonymous', // Temporaire - sera remplacé par authentification
+        notification_token: notificationToken, // Inclure le token pour le backend
       };
 
       console.log('Données de réservation:', bookingData);
@@ -192,14 +221,25 @@ export default function BookingCalendarScreen() {
         const appointment = await response.json();
         console.log('Rendez-vous créé:', appointment);
         
+        // Programmer une notification de test pour démonstration
+        if (notificationToken) {
+          try {
+            await NotificationService.scheduleTestNotification(10); // Test dans 10 secondes
+            console.log('Notification de test programmée');
+          } catch (testError) {
+            console.error('Erreur notification test:', testError);
+          }
+        }
+        
         Alert.alert(
-          'Rendez-vous confirmé !', 
-          'Votre rendez-vous a été créé avec succès.',
+          'Rendez-vous confirmé ! ✅', 
+          notificationToken 
+            ? 'Votre rendez-vous a été créé avec succès. Vous recevrez un rappel 1h avant.'
+            : 'Votre rendez-vous a été créé avec succès.',
           [
             {
               text: 'OK',
               onPress: () => {
-                // Rediriger vers la confirmation
                 router.push({
                   pathname: '/booking-confirmation',
                   params: {

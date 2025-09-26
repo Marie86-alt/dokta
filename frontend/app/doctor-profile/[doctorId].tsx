@@ -95,15 +95,6 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
     console.log(`Clic sur ${type}, doctor:`, doctor);
     console.log('User context:', user);
-    
-    if (!user) {
-      console.log('Pas d\'utilisateur connecté, affichage alerte connexion');
-      Alert.alert('Connexion requise', 'Veuillez vous connecter pour prendre rendez-vous', [
-        { text: 'Annuler', style: 'cancel' },
-        { text: 'Se connecter', onPress: () => router.push('/login') }
-      ]);
-      return;
-    }
 
     if (!doctor) {
       console.log('Pas d\'informations médecin disponibles');
@@ -111,9 +102,11 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
       return;
     }
 
+    // Test navigation direct sans vérification d'authentification
+    console.log('Navigation vers patient-selection...');
+    
     switch (type) {
       case 'cabinet':
-        // Rediriger vers la sélection du patient puis calendrier
         router.push({
           pathname: '/patient-selection',
           params: { 
@@ -125,44 +118,26 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
         });
         break;
       case 'domicile':
-        Alert.alert(
-          'Consultation à domicile',
-          `Tarif : ${formatPrice(doctor.tarif + 5000)} (+ 5000 FCFA frais de déplacement)\n\nConfirmer la demande ?`,
-          [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Confirmer', onPress: () => 
-              router.push({
-                pathname: '/patient-selection',
-                params: { 
-                  doctorId: doctorId as string,
-                  consultationType: 'domicile',
-                  doctorName: doctor.nom,
-                  price: (doctor.tarif + 5000).toString()
-                }
-              })
-            }
-          ]
-        );
+        router.push({
+          pathname: '/patient-selection',
+          params: { 
+            doctorId: doctorId as string,
+            consultationType: 'domicile',
+            doctorName: doctor.nom,
+            price: (doctor.tarif + 5000).toString()
+          }
+        });
         break;
       case 'teleconsultation':
-        Alert.alert(
-          'Téléconsultation',
-          `Tarif : ${formatPrice(doctor.tarif - 2000)} (-2000 FCFA en ligne)\n\nConfirmer la demande ?`,
-          [
-            { text: 'Annuler', style: 'cancel' },
-            { text: 'Confirmer', onPress: () =>
-              router.push({
-                pathname: '/patient-selection',
-                params: { 
-                  doctorId: doctorId as string,
-                  consultationType: 'teleconsultation',
-                  doctorName: doctor.nom,
-                  price: (doctor.tarif - 2000).toString()
-                }
-              })
-            }
-          ]
-        );
+        router.push({
+          pathname: '/patient-selection',
+          params: { 
+            doctorId: doctorId as string,
+            consultationType: 'teleconsultation',
+            doctorName: doctor.nom,
+            price: (doctor.tarif - 2000).toString()
+          }
+        });
         break;
     }
   };

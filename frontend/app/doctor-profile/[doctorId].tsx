@@ -98,47 +98,58 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
 
     if (!doctor) {
       console.log('Pas d\'informations médecin disponibles');
-      Alert.alert('Erreur', 'Informations médecin non disponibles');
       return;
     }
 
     // Test navigation direct sans vérification d'authentification
     console.log('Navigation vers patient-selection...');
+    console.log('Doctor tarif:', doctor.tarif);
+    console.log('Doctor nom:', doctor.nom);
     
-    switch (type) {
-      case 'cabinet':
-        router.push({
-          pathname: '/patient-selection',
-          params: { 
-            doctorId: doctorId as string,
-            consultationType: 'cabinet',
-            doctorName: doctor.nom,
-            price: doctor.tarif.toString()
-          }
-        });
-        break;
-      case 'domicile':
-        router.push({
-          pathname: '/patient-selection',
-          params: { 
-            doctorId: doctorId as string,
-            consultationType: 'domicile',
-            doctorName: doctor.nom,
-            price: (doctor.tarif + 5000).toString()
-          }
-        });
-        break;
-      case 'teleconsultation':
-        router.push({
-          pathname: '/patient-selection',
-          params: { 
-            doctorId: doctorId as string,
-            consultationType: 'teleconsultation',
-            doctorName: doctor.nom,
-            price: (doctor.tarif - 2000).toString()
-          }
-        });
-        break;
+    try {
+      switch (type) {
+        case 'cabinet':
+          console.log('Cas cabinet - avant navigation');
+          router.push({
+            pathname: '/patient-selection',
+            params: { 
+              doctorId: doctorId as string,
+              consultationType: 'cabinet',
+              doctorName: doctor.nom,
+              price: doctor.tarif.toString()
+            }
+          });
+          console.log('Cas cabinet - après navigation');
+          break;
+        case 'domicile':
+          console.log('Cas domicile - avant navigation');
+          router.push({
+            pathname: '/patient-selection',
+            params: { 
+              doctorId: doctorId as string,
+              consultationType: 'domicile',
+              doctorName: doctor.nom,
+              price: (doctor.tarif + 5000).toString()
+            }
+          });
+          console.log('Cas domicile - après navigation');
+          break;
+        case 'teleconsultation':
+          console.log('Cas teleconsultation - avant navigation');
+          router.push({
+            pathname: '/patient-selection',
+            params: { 
+              doctorId: doctorId as string,
+              consultationType: 'teleconsultation',
+              doctorName: doctor.nom,
+              price: (doctor.tarif - 2000).toString()
+            }
+          });
+          console.log('Cas teleconsultation - après navigation');
+          break;
+      }
+    } catch (error) {
+      console.error('Erreur navigation:', error);
     }
   };
 

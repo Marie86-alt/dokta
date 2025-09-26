@@ -174,7 +174,7 @@ export default function BookingCalendarScreen() {
         time: selectedTime,
         consultation_type: consultationType,
         price: parseInt(price as string),
-        user_id: user?.id,
+        user_id: 'anonymous', // Temporaire - sera remplacé par authentification
       };
 
       console.log('Données de réservation:', bookingData);

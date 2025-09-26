@@ -617,4 +617,10 @@ const styles = StyleSheet.create({
     color: '#666',
     lineHeight: 18,
   },
+  doctorsSection: {
+    padding: 16,
+    backgroundColor: '#FFFFFF',
+    marginBottom: 8,
+    zIndex: 1,
+  },
 });

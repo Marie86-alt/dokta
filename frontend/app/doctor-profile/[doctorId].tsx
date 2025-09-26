@@ -344,6 +344,7 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
           </TouchableOpacity>
         </View>
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }

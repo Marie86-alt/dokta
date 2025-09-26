@@ -95,8 +95,6 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
     console.log('=== DÉBUT DE FONCTION ===');
     console.log('Type:', type);
-    console.log('Doctor object:', doctor);
-    console.log('Doctor truthy:', !!doctor);
     
     if (!doctor) {
       console.log('Pas d\'informations médecin disponibles - RETURN');
@@ -105,24 +103,28 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
     
     try {
       console.log('=== AVANT NAVIGATION ===');
-      console.log('Doctor ID:', doctorId);
-      console.log('Doctor nom:', doctor.nom);
-      console.log('Doctor tarif:', doctor.tarif);
+      console.log('DoctorId param:', doctorId);
       
-      let finalPrice = doctor.tarif;
-      if (type === 'domicile') {
-        finalPrice = doctor.tarif + 5000;
-      } else if (type === 'teleconsultation') {
-        finalPrice = doctor.tarif - 2000;
+      let finalPrice = 10000; // Prix par défaut
+      if (doctor && typeof doctor.tarif === 'number') {
+        finalPrice = doctor.tarif;
       }
       
-      // Navigation avec tous les paramètres nécessaires
+      if (type === 'domicile') {
+        finalPrice = finalPrice + 5000;
+      } else if (type === 'teleconsultation') {
+        finalPrice = finalPrice - 2000;
+      }
+      
+      console.log('Prix calculé:', finalPrice);
+      
+      // Navigation avec paramètres sécurisés
       router.push({
         pathname: '/patient-selection',
         params: { 
           doctorId: doctorId as string,
           consultationType: type,
-          doctorName: doctor.nom,
+          doctorName: doctor?.nom || 'Médecin',
           price: finalPrice.toString()
         }
       });

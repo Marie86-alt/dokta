@@ -93,6 +93,8 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
   };
 
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
+    console.log(`Clic sur ${type}, doctor:`, doctor);
+    
     if (!user) {
       Alert.alert('Connexion requise', 'Veuillez vous connecter pour prendre rendez-vous', [
         { text: 'Annuler', style: 'cancel' },

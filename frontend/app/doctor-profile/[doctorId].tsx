@@ -96,11 +96,34 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
     console.log('=== DÉBUT DE FONCTION ===');
     console.log('Type:', type);
     
+    if (!doctor) {
+      console.log('Pas d\'informations médecin disponibles');
+      return;
+    }
+    
     try {
       console.log('=== AVANT NAVIGATION ===');
+      console.log('Doctor ID:', doctorId);
+      console.log('Doctor nom:', doctor.nom);
+      console.log('Doctor tarif:', doctor.tarif);
       
-      // Navigation ultra simple pour test
-      router.push('/patient-selection');
+      let finalPrice = doctor.tarif;
+      if (type === 'domicile') {
+        finalPrice = doctor.tarif + 5000;
+      } else if (type === 'teleconsultation') {
+        finalPrice = doctor.tarif - 2000;
+      }
+      
+      // Navigation avec tous les paramètres nécessaires
+      router.push({
+        pathname: '/patient-selection',
+        params: { 
+          doctorId: doctorId as string,
+          consultationType: type,
+          doctorName: doctor.nom,
+          price: finalPrice.toString()
+        }
+      });
       
       console.log('=== APRÈS NAVIGATION ===');
     } catch (error) {

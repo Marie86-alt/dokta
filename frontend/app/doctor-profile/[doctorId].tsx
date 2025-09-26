@@ -212,7 +212,8 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
         <Text style={styles.headerTitle}>Profil du médecin</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.doctorsSection}>
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Doctor Info Card */}
         <View style={styles.doctorCard}>
           <View style={styles.doctorHeader}>

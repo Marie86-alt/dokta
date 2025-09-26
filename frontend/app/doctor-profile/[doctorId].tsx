@@ -94,8 +94,10 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
 
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
     console.log(`Clic sur ${type}, doctor:`, doctor);
+    console.log('User context:', user);
     
     if (!user) {
+      console.log('Pas d\'utilisateur connecté, affichage alerte connexion');
       Alert.alert('Connexion requise', 'Veuillez vous connecter pour prendre rendez-vous', [
         { text: 'Annuler', style: 'cancel' },
         { text: 'Se connecter', onPress: () => router.push('/login') }
@@ -104,6 +106,7 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
     }
 
     if (!doctor) {
+      console.log('Pas d\'informations médecin disponibles');
       Alert.alert('Erreur', 'Informations médecin non disponibles');
       return;
     }

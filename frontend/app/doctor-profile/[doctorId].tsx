@@ -282,10 +282,27 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
         <View style={styles.consultationSection}>
           <Text style={styles.consultationTitle}>Choisir le type de consultation</Text>
           
+          {/* Test Simple Button */}
           <TouchableOpacity 
-            style={styles.consultationCard}
+            style={{
+              backgroundColor: '#2E8B57',
+              padding: 20,
+              margin: 10,
+              borderRadius: 10,
+              alignItems: 'center',
+            }}
             onPress={() => {
-              console.log('CLICK DÉTECTÉ sur cabinet');
+              Alert.alert('SUCCESS!', 'Test bouton simple fonctionne!');
+            }}
+          >
+            <Text style={{ color: 'white', fontSize: 18, fontWeight: 'bold' }}>
+              🧪 TEST BOUTON SIMPLE
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.consultationCard, { zIndex: 999 }]}
+            onPress={() => {
               Alert.alert('Test', 'Bouton consultation cabinet cliqué !');
               handleConsultationType('cabinet');
             }}

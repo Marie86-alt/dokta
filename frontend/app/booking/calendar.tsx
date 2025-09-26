@@ -30,7 +30,7 @@ export default function BookingCalendarScreen() {
     patientAge 
   } = useLocalSearchParams();
   
-  const { user } = useAuth();
+  // const { user } = useAuth(); // Commenté temporairement
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);

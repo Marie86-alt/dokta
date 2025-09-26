@@ -94,7 +94,7 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
 
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
     console.log(`Clic sur ${type}, doctor:`, doctor);
-    console.log('User context:', user);
+    // console.log('User context:', user); // Commenté temporairement
 
     if (!doctor) {
       console.log('Pas d\'informations médecin disponibles');

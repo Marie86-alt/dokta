@@ -163,6 +163,17 @@ export default function BookingConfirmation() {
               Retour à l'accueil
             </Text>
           </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.homeButton, styles.testButton]}
+            onPress={async () => {
+              await NotificationService.scheduleTestNotification(5);
+              alert('Notification de test programmée dans 5 secondes ! 🔔');
+            }}
+          >
+            <Ionicons name="notifications" size={20} color="#FFFFFF" />
+            <Text style={styles.homeButtonText}>Test notification (5s)</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Contact Info */}

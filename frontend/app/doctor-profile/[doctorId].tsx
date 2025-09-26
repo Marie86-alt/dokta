@@ -95,9 +95,11 @@ Consultations disponibles au cabinet, à domicile ou en téléconsultation selon
   const handleConsultationType = (type: 'cabinet' | 'domicile' | 'teleconsultation') => {
     console.log('=== DÉBUT DE FONCTION ===');
     console.log('Type:', type);
+    console.log('Doctor object:', doctor);
+    console.log('Doctor truthy:', !!doctor);
     
     if (!doctor) {
-      console.log('Pas d\'informations médecin disponibles');
+      console.log('Pas d\'informations médecin disponibles - RETURN');
       return;
     }
     

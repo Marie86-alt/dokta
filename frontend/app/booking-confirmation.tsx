@@ -327,6 +327,10 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FFFFFF',
   },
+  testButton: {
+    backgroundColor: '#E67E22',
+    marginTop: 12,
+  },
   contactCard: {
     backgroundColor: '#FFFFFF',
     borderRadius: 12,

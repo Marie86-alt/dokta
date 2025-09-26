@@ -31,6 +31,15 @@ export default function BookingCalendarScreen() {
   } = useLocalSearchParams();
   
   // const { user } = useAuth(); // Commenté temporairement
+  
+  // Debug des paramètres reçus
+  console.log('=== PARAMÈTRES CALENDRIER ===');
+  console.log('doctorId:', doctorId);
+  console.log('consultationType:', consultationType);
+  console.log('doctorName:', doctorName);
+  console.log('price:', price);
+  console.log('patientName:', patientName);
+  console.log('=== FIN PARAMÈTRES ===');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [availableSlots, setAvailableSlots] = useState<TimeSlot[]>([]);

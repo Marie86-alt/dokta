@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
+import NotificationService from '../services/notificationService';
 
 export default function BookingConfirmation() {
   const params = useLocalSearchParams();

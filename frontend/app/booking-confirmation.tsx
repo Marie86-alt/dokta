@@ -8,6 +8,7 @@ import {
   SafeAreaView,
   StatusBar,
   Alert,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';

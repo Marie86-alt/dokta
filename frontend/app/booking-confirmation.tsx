@@ -79,28 +79,36 @@ export default function BookingConfirmation() {
           label: 'Lieu de rendez-vous',
           address: 'Cabinet Médical Central, Avenue Kennedy, Yaoundé',
           icon: 'business' as any,
-          mapsUrl: 'https://maps.google.com/?q=Cabinet+Médical+Central+Avenue+Kennedy+Yaoundé'
+          mapsUrl: 'https://maps.google.com/?q=Cabinet+Médical+Central+Avenue+Kennedy+Yaoundé',
+          showLocationButton: false
         };
       case 'domicile':
         return {
           label: 'Adresse de consultation',
-          address: 'Votre domicile (adresse confirmée par SMS)',
+          address: userLocation 
+            ? LocationService.formatAddress(userLocation)
+            : 'Votre domicile (localisation en cours...)',
           icon: 'home' as any,
-          mapsUrl: null
+          mapsUrl: userLocation 
+            ? `https://maps.google.com/?q=${userLocation.latitude},${userLocation.longitude}`
+            : null,
+          showLocationButton: !userLocation
         };
       case 'teleconsultation':
         return {
           label: 'Mode de consultation',
           address: 'Consultation vidéo en ligne',
           icon: 'videocam' as any,
-          mapsUrl: null
+          mapsUrl: null,
+          showLocationButton: false
         };
       default:
         return {
           label: 'Lieu de rendez-vous',
           address: 'À confirmer',
           icon: 'location' as any,
-          mapsUrl: null
+          mapsUrl: null,
+          showLocationButton: false
         };
     }
   };

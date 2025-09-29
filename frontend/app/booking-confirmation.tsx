@@ -26,9 +26,34 @@ export default function BookingConfirmation() {
     price
   } = params;
 
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
+  const [loadingLocation, setLoadingLocation] = useState(false);
+
   const handleBackHome = () => {
     router.replace('/');
   };
+
+  // Obtenir la localisation pour afficher l'adresse appropriée
+  const getCurrentLocation = async () => {
+    if (loadingLocation) return;
+    
+    setLoadingLocation(true);
+    try {
+      const location = await LocationService.getCurrentLocation();
+      setUserLocation(location);
+    } catch (error) {
+      console.error('Erreur géolocalisation:', error);
+    } finally {
+      setLoadingLocation(false);
+    }
+  };
+
+  // Obtenir la localisation automatiquement pour les consultations à domicile
+  useEffect(() => {
+    if (consultationType === 'domicile') {
+      getCurrentLocation();
+    }
+  }, [consultationType]);
 
   const formatPrice = (priceValue: string) => {
     const numPrice = parseInt(priceValue);

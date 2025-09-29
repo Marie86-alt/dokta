@@ -353,6 +353,17 @@ const styles = StyleSheet.create({
     color: '#2E8B57',
     fontWeight: 'bold',
   },
+  mapsButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 4,
+    gap: 4,
+  },
+  mapsButtonText: {
+    fontSize: 12,
+    color: '#3498DB',
+    textDecorationLine: 'underline',
+  },
   instructionsCard: {
     backgroundColor: '#FFF8DC',
     borderRadius: 12,

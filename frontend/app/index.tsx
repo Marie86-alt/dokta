@@ -546,6 +546,16 @@ const styles = StyleSheet.create({
   headerContent: {
     flex: 1,
   },
+  titleSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  logoIcon: {
+    marginRight: 8,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    padding: 4,
+    borderRadius: 12,
+  },
   appTitle: {
     fontSize: 28,
     fontWeight: 'bold',
@@ -555,6 +565,21 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#E8F5E8',
     marginTop: 2,
+  },
+  locationText: {
+    fontSize: 11,
+    color: '#E8F5E8',
+    marginTop: 4,
+    fontStyle: 'italic',
+  },
+  headerActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  locationButtonHeader: {
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    borderColor: 'rgba(255, 255, 255, 0.3)',
   },
   headerButton: {
     padding: 8,

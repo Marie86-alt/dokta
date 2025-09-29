@@ -17,20 +17,68 @@ export default function BookingConfirmation() {
   const {
     appointmentId,
     doctorName,
-    specialite,
+    patientName,
     date,
     time,
-    patientNom,
-    tarif
+    consultationType,
+    price
   } = params;
 
   const handleBackHome = () => {
     router.replace('/');
   };
 
-  const formatPrice = (price: string) => {
-    return `${parseInt(price).toLocaleString()} FCFA`;
+  const formatPrice = (priceValue: string) => {
+    const numPrice = parseInt(priceValue);
+    if (isNaN(numPrice)) {
+      return "0 FCFA";
+    }
+    return `${numPrice.toLocaleString()} FCFA`;
   };
+
+  const getConsultationTypeLabel = (type: string) => {
+    switch (type) {
+      case 'cabinet': return 'Consultation au cabinet';
+      case 'domicile': return 'Consultation à domicile';
+      case 'teleconsultation': return 'Téléconsultation';
+      default: return 'Consultation';
+    }
+  };
+
+  const getLocationInfo = () => {
+    switch (consultationType) {
+      case 'cabinet':
+        return {
+          label: 'Lieu de rendez-vous',
+          address: 'Cabinet Médical Central, Avenue Kennedy, Yaoundé',
+          icon: 'business' as any,
+          mapsUrl: 'https://maps.google.com/?q=Cabinet+Médical+Central+Avenue+Kennedy+Yaoundé'
+        };
+      case 'domicile':
+        return {
+          label: 'Adresse de consultation',
+          address: 'Votre domicile (adresse confirmée par SMS)',
+          icon: 'home' as any,
+          mapsUrl: null
+        };
+      case 'teleconsultation':
+        return {
+          label: 'Mode de consultation',
+          address: 'Consultation vidéo en ligne',
+          icon: 'videocam' as any,
+          mapsUrl: null
+        };
+      default:
+        return {
+          label: 'Lieu de rendez-vous',
+          address: 'À confirmer',
+          icon: 'location' as any,
+          mapsUrl: null
+        };
+    }
+  };
+
+  const locationInfo = getLocationInfo();
 
   return (
     <SafeAreaView style={styles.container}>

@@ -543,11 +543,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
+  logoContainer: {
+    marginRight: 12,
+  },
   logoIcon: {
-    marginRight: 8,
+    width: 40,
+    height: 40,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    padding: 4,
-    borderRadius: 12,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  logoSecondary: {
+    position: 'absolute',
+    bottom: 2,
   },
   appTitle: {
     fontSize: 28,

@@ -400,28 +400,21 @@ export default function Index() {
       <View style={styles.header}>
         <View style={styles.headerContent}>
           <View style={styles.titleSection}>
-            <Ionicons name="location" size={20} color="#27AE60" style={styles.logoIcon} />
+            <View style={styles.logoContainer}>
+              <View style={styles.logoIcon}>
+                <Ionicons name="heart" size={16} color="#E74C3C" />
+                <Ionicons name="people" size={10} color="#F39C12" style={styles.logoSecondary} />
+              </View>
+            </View>
             <View>
               <Text style={styles.appTitle}>DOKTA</Text>
-              <Text style={styles.appSubtitle}>Santé digitale - Cameroun</Text>
+              <Text style={styles.appSubtitle}>Connecting Patients & Doctors with Care</Text>
             </View>
           </View>
-          {userLocation && (
-            <Text style={styles.locationText}>
-              📍 {userLocation.city || 'Position détectée'}
-            </Text>
-          )}
         </View>
-        <View style={styles.headerActions}>
-          <LocationButton 
-            compact={true}
-            onLocationUpdate={handleLocationUpdate}
-            style={styles.locationButtonHeader}
-          />
-          <TouchableOpacity style={styles.headerButton}>
-            <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
-          </TouchableOpacity>
-        </View>
+        <TouchableOpacity style={styles.headerButton}>
+          <Ionicons name="notifications-outline" size={24} color="#FFFFFF" />
+        </TouchableOpacity>
       </View>
 
       {/* Content */}

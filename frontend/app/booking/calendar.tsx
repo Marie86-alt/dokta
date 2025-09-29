@@ -240,32 +240,19 @@ export default function BookingCalendarScreen() {
           }
         }
         
-        Alert.alert(
-          'Rendez-vous confirmé ! ✅', 
-          notificationToken 
-            ? 'Votre rendez-vous a été créé avec succès. Vous recevrez un rappel 1h avant.'
-            : 'Votre rendez-vous a été créé avec succès.',
-          [
-            {
-              text: 'OK',
-              onPress: () => {
-                console.log('🔄 Navigation vers confirmation...');
-                router.push({
-                  pathname: '/booking-confirmation',
-                  params: {
-                    appointmentId: appointment.id,
-                    doctorName: doctorName as string,
-                    patientName: patientName as string,
-                    date: selectedDate,
-                    time: selectedTime,
-                    consultationType: consultationType as string,
-                    price: price as string,
-                  }
-                });
-              }
-            }
-          ]
-        );
+        console.log('🔄 Navigation directe vers confirmation...');
+        router.push({
+          pathname: '/booking-confirmation',
+          params: {
+            appointmentId: appointment.id,
+            doctorName: doctorName as string,
+            patientName: patientName as string,
+            date: selectedDate,
+            time: selectedTime,
+            consultationType: consultationType as string,
+            price: price as string,
+          }
+        });
       } else {
         const errorData = await response.text();
         console.error('❌ Erreur API:', errorData);

@@ -408,10 +408,29 @@ const styles = StyleSheet.create({
     color: '#2E8B57',
     fontWeight: 'bold',
   },
+  locationActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 8,
+    gap: 16,
+  },
+  locationButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFF3E0',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 6,
+    gap: 4,
+  },
+  locationButtonText: {
+    fontSize: 11,
+    color: '#E67E22',
+    fontWeight: '500',
+  },
   mapsButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 4,
     gap: 4,
   },
   mapsButtonText: {

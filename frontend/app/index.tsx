@@ -47,9 +47,18 @@ export default function Index() {
   const [specialties, setSpecialties] = useState<Specialty[]>([]);
   const [featuredDoctors, setFeaturedDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(false);
+  const [userLocation, setUserLocation] = useState<LocationData | null>(null);
 
   // Utiliser le contexte d'authentification
   const { user, logout } = useAuth();
+
+  // Gestionnaire de mise à jour de localisation
+  const handleLocationUpdate = (location: LocationData | null) => {
+    setUserLocation(location);
+    if (location) {
+      console.log('📍 Position utilisateur mise à jour:', LocationService.formatAddress(location));
+    }
+  };
 
   useEffect(() => {
     fetchInitialData();

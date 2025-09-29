@@ -163,11 +163,23 @@ export default function BookingConfirmation() {
 
           <View style={styles.detailRow}>
             <View style={styles.detailIcon}>
-              <Ionicons name="person-circle" size={20} color="#2E8B57" />
+              <Ionicons name={locationInfo.icon} size={20} color="#2E8B57" />
             </View>
             <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Patient</Text>
-              <Text style={styles.detailValue}>{patientNom}</Text>
+              <Text style={styles.detailLabel}>{locationInfo.label}</Text>
+              <Text style={styles.detailValue}>{locationInfo.address}</Text>
+              {locationInfo.mapsUrl && (
+                <TouchableOpacity 
+                  style={styles.mapsButton}
+                  onPress={() => {
+                    const { Linking } = require('expo-linking');
+                    Linking.openURL(locationInfo.mapsUrl);
+                  }}
+                >
+                  <Ionicons name="navigate" size={14} color="#3498DB" />
+                  <Text style={styles.mapsButtonText}>Voir l'itinéraire</Text>
+                </TouchableOpacity>
+              )}
             </View>
           </View>
 
@@ -176,9 +188,9 @@ export default function BookingConfirmation() {
               <Ionicons name="cash" size={20} color="#2E8B57" />
             </View>
             <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Montant payé</Text>
+              <Text style={styles.detailLabel}>Montant à payer</Text>
               <Text style={[styles.detailValue, styles.priceValue]}>
-                {formatPrice(tarif as string)}
+                {formatPrice(price as string)}
               </Text>
             </View>
           </View>

@@ -131,11 +131,21 @@ export default function BookingConfirmation() {
 
           <View style={styles.detailRow}>
             <View style={styles.detailIcon}>
+              <Ionicons name="person-circle" size={20} color="#2E8B57" />
+            </View>
+            <View style={styles.detailContent}>
+              <Text style={styles.detailLabel}>Patient</Text>
+              <Text style={styles.detailValue}>{patientName}</Text>
+            </View>
+          </View>
+
+          <View style={styles.detailRow}>
+            <View style={styles.detailIcon}>
               <Ionicons name="medical" size={20} color="#2E8B57" />
             </View>
             <View style={styles.detailContent}>
-              <Text style={styles.detailLabel}>Spécialité</Text>
-              <Text style={styles.detailValue}>{specialite}</Text>
+              <Text style={styles.detailLabel}>Type de consultation</Text>
+              <Text style={styles.detailValue}>{getConsultationTypeLabel(consultationType as string)}</Text>
             </View>
           </View>
 

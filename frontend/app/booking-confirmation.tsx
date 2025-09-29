@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -6,11 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
-  StatusBar
+  StatusBar,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useLocalSearchParams, router } from 'expo-router';
 import NotificationService from '../services/notificationService';
+import LocationService, { LocationData } from '../services/locationService';
 
 export default function BookingConfirmation() {
   const params = useLocalSearchParams();

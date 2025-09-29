@@ -227,7 +227,6 @@ export default function BookingConfirmation() {
                   <TouchableOpacity 
                     style={styles.mapsButton}
                     onPress={() => {
-                      const { Linking } = require('expo-linking');
                       Linking.openURL(locationInfo.mapsUrl);
                     }}
                   >

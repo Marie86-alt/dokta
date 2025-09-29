@@ -203,18 +203,38 @@ export default function BookingConfirmation() {
             <View style={styles.detailContent}>
               <Text style={styles.detailLabel}>{locationInfo.label}</Text>
               <Text style={styles.detailValue}>{locationInfo.address}</Text>
-              {locationInfo.mapsUrl && (
-                <TouchableOpacity 
-                  style={styles.mapsButton}
-                  onPress={() => {
-                    const { Linking } = require('expo-linking');
-                    Linking.openURL(locationInfo.mapsUrl);
-                  }}
-                >
-                  <Ionicons name="navigate" size={14} color="#3498DB" />
-                  <Text style={styles.mapsButtonText}>Voir l'itinéraire</Text>
-                </TouchableOpacity>
-              )}
+              
+              <View style={styles.locationActions}>
+                {locationInfo.showLocationButton && (
+                  <TouchableOpacity 
+                    style={styles.locationButton}
+                    onPress={getCurrentLocation}
+                    disabled={loadingLocation}
+                  >
+                    <Ionicons 
+                      name={loadingLocation ? "hourglass" : "location"} 
+                      size={14} 
+                      color="#E67E22" 
+                    />
+                    <Text style={styles.locationButtonText}>
+                      {loadingLocation ? 'Localisation...' : 'Obtenir ma position'}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+                
+                {locationInfo.mapsUrl && (
+                  <TouchableOpacity 
+                    style={styles.mapsButton}
+                    onPress={() => {
+                      const { Linking } = require('expo-linking');
+                      Linking.openURL(locationInfo.mapsUrl);
+                    }}
+                  >
+                    <Ionicons name="navigate" size={14} color="#3498DB" />
+                    <Text style={styles.mapsButtonText}>Voir l'itinéraire</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
             </View>
           </View>
 

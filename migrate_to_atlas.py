@@ -91,7 +91,11 @@ def test_atlas_connection(connection_string):
     """Test de connexion Atlas"""
     try:
         print("🧪 Test de connexion Atlas...")
-        client = pymongo.MongoClient(connection_string)
+        # Ajout des paramètres SSL pour Atlas
+        if "ssl=true" not in connection_string.lower():
+            separator = "&" if "?" in connection_string else "?"
+            connection_string = f"{connection_string}{separator}ssl=true&ssl_cert_reqs=CERT_NONE"
+        client = pymongo.MongoClient(connection_string, tlsAllowInvalidCertificates=True)
         
         # Test basique
         client.admin.command('ping')

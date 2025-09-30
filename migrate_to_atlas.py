@@ -25,14 +25,12 @@ def migrate_to_atlas(atlas_connection_string, source_host="localhost:27017"):
         
         # Connexion à Atlas
         print("🌐 Connexion à MongoDB Atlas...")
-        # Paramètres SSL compatibles Atlas en environnement containerisé
+        # Version compatible avec PyMongo dans un container
         atlas_client = pymongo.MongoClient(
             atlas_connection_string,
-            ssl=True,
-            ssl_cert_reqs=None,
-            ssl_match_hostname=False,
-            connect=False,
-            serverSelectionTimeoutMS=5000
+            connectTimeoutMS=10000,
+            serverSelectionTimeoutMS=10000,
+            socketTimeoutMS=20000
         )
         atlas_db = atlas_client['dokta_production']  # Nouveau nom plus propre
         

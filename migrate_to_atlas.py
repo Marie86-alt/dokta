@@ -25,7 +25,11 @@ def migrate_to_atlas(atlas_connection_string, source_host="localhost:27017"):
         
         # Connexion à Atlas
         print("🌐 Connexion à MongoDB Atlas...")
-        atlas_client = pymongo.MongoClient(atlas_connection_string)
+        # Ajout des paramètres SSL pour Atlas
+        if "ssl=true" not in atlas_connection_string.lower():
+            separator = "&" if "?" in atlas_connection_string else "?"
+            atlas_connection_string = f"{atlas_connection_string}{separator}ssl=true&ssl_cert_reqs=CERT_NONE"
+        atlas_client = pymongo.MongoClient(atlas_connection_string, tlsAllowInvalidCertificates=True)
         atlas_db = atlas_client['dokta_production']  # Nouveau nom plus propre
         
         # Collections à migrer

@@ -776,6 +776,160 @@ async def create_appointment_simple(request: Request):
         print(f"Erreur création rendez-vous: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+# ===============================================
+# ROUTES DE MIGRATION ATLAS (TEMPORAIRES)
+# ===============================================
+
+@api_router.get("/migration/test-atlas")
+async def test_atlas_connection():
+    """Test de connexion à MongoDB Atlas depuis le backend"""
+    try:
+        # URI Atlas fournie par l'utilisateur
+        atlas_uri = "mongodb+srv://mariejulie552_db_user:vBkeJK66ILoNba6k@dokta-cluster.j60yq2i.mongodb.net/"
+        
+        # Test de connexion avec timeouts appropriés
+        atlas_client = AsyncIOMotorClient(
+            atlas_uri,
+            connectTimeoutMS=10000,
+            serverSelectionTimeoutMS=10000,
+            socketTimeoutMS=20000
+        )
+        
+        # Test ping
+        await atlas_client.admin.command('ping')
+        
+        # Test base de données
+        atlas_db = atlas_client['dokta_production']
+        collections = await atlas_db.list_collection_names()
+        
+        atlas_client.close()
+        
+        return {
+            "status": "success",
+            "message": "✅ Connexion Atlas réussie depuis le backend!",
+            "database": "dokta_production",
+            "existing_collections": collections
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"❌ Connexion Atlas échouée: {str(e)}",
+            "error_type": type(e).__name__
+        }
+
+@api_router.post("/migration/migrate-to-atlas")
+async def migrate_to_atlas():
+    """Migration complète des données vers Atlas"""
+    try:
+        # URI Atlas
+        atlas_uri = "mongodb+srv://mariejulie552_db_user:vBkeJK66ILoNba6k@dokta-cluster.j60yq2i.mongodb.net/"
+        
+        # Connexion Atlas
+        atlas_client = AsyncIOMotorClient(
+            atlas_uri,
+            connectTimeoutMS=10000,
+            serverSelectionTimeoutMS=10000,
+            socketTimeoutMS=20000
+        )
+        atlas_db = atlas_client['dokta_production']
+        
+        # Collections à migrer
+        collections = ['doctors', 'appointments', 'users']
+        migration_results = {}
+        
+        for collection_name in collections:
+            # Lire données locales
+            local_collection = db[collection_name]
+            local_data = await local_collection.find({}, {"_id": 0}).to_list(1000)
+            
+            if not local_data:
+                migration_results[collection_name] = {
+                    "status": "empty",
+                    "local_count": 0,
+                    "migrated_count": 0
+                }
+                continue
+            
+            # Collection Atlas
+            atlas_collection = atlas_db[collection_name]
+            
+            # Vider la collection de destination
+            await atlas_collection.delete_many({})
+            
+            # Insérer données
+            result = await atlas_collection.insert_many(local_data)
+            
+            # Vérification
+            atlas_count = await atlas_collection.count_documents({})
+            
+            migration_results[collection_name] = {
+                "status": "success" if len(local_data) == atlas_count else "partial",
+                "local_count": len(local_data),
+                "migrated_count": atlas_count,
+                "inserted_ids": len(result.inserted_ids)
+            }
+        
+        atlas_client.close()
+        
+        return {
+            "status": "success",
+            "message": "🎉 Migration terminée!",
+            "results": migration_results,
+            "atlas_uri": atlas_uri.replace(atlas_uri.split('@')[0].split('://')[1], "***:***"),
+            "new_database": "dokta_production"
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"❌ Erreur migration: {str(e)}",
+            "error_type": type(e).__name__
+        }
+
+@api_router.get("/migration/status")
+async def migration_status():
+    """Statut des données locales et Atlas"""
+    try:
+        # Données locales
+        local_stats = {}
+        collections = ['doctors', 'appointments', 'users']
+        
+        for collection_name in collections:
+            count = await db[collection_name].count_documents({})
+            local_stats[collection_name] = count
+        
+        # Test Atlas si possible
+        atlas_stats = {}
+        try:
+            atlas_uri = "mongodb+srv://mariejulie552_db_user:vBkeJK66ILoNba6k@dokta-cluster.j60yq2i.mongodb.net/"
+            atlas_client = AsyncIOMotorClient(atlas_uri, serverSelectionTimeoutMS=5000)
+            atlas_db = atlas_client['dokta_production']
+            
+            for collection_name in collections:
+                count = await atlas_db[collection_name].count_documents({})
+                atlas_stats[collection_name] = count
+                
+            atlas_client.close()
+            atlas_connection = True
+            
+        except:
+            atlas_connection = False
+        
+        return {
+            "local_database": local_stats,
+            "atlas_database": atlas_stats,
+            "atlas_connection": atlas_connection,
+            "total_local_documents": sum(local_stats.values()),
+            "total_atlas_documents": sum(atlas_stats.values()) if atlas_connection else 0
+        }
+        
+    except Exception as e:
+        return {
+            "status": "error",
+            "message": f"❌ Erreur statut: {str(e)}"
+        }
+
 # Include the router in the main app
 app.include_router(api_router)
 

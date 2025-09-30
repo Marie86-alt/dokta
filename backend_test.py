@@ -11,7 +11,7 @@ import sys
 import os
 
 # Configuration
-BACKEND_URL = "https://medi-cameroon.preview.emergentagent.com/api"
+BACKEND_URL = "https://healthbook-cm.preview.emergentagent.com/api"
 
 class DOKTABackendTester:
     def __init__(self):

@@ -1,0 +1,11 @@
+{
+  "name": "dokta-mongodb-admin",
+  "version": "1.0.0",
+  "description": "DOKTA MongoDB Administration Interface",
+  "main": "index.js",
+  "scripts": {
+    "start": "mongo-express"
+  },
+  "author": "DOKTA Team",
+  "license": "MIT"
+}

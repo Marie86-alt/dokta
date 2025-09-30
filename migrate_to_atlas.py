@@ -95,14 +95,12 @@ def test_atlas_connection(connection_string):
     """Test de connexion Atlas"""
     try:
         print("🧪 Test de connexion Atlas...")
-        # Paramètres SSL compatibles Atlas en environnement containerisé
+        # Version compatible avec PyMongo dans un container
         client = pymongo.MongoClient(
             connection_string,
-            ssl=True,
-            ssl_cert_reqs=None,
-            ssl_match_hostname=False,
-            connect=False,
-            serverSelectionTimeoutMS=5000
+            connectTimeoutMS=10000,
+            serverSelectionTimeoutMS=10000,
+            socketTimeoutMS=20000
         )
         
         # Test basique

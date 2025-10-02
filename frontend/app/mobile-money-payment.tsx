@@ -18,6 +18,7 @@ interface PaymentMethod {
   name: string;
   icon: string;
   color: string;
+  provider: string;
 }
 
 const PAYMENT_METHODS: PaymentMethod[] = [
@@ -26,21 +27,24 @@ const PAYMENT_METHODS: PaymentMethod[] = [
     name: 'MTN Mobile Money',
     icon: 'phone-portrait',
     color: '#FFDD00',
+    provider: 'mtn_momo',
   },
   {
     id: 'orange',
     name: 'Orange Money',
     icon: 'phone-portrait',
     color: '#FF6600',
+    provider: 'orange_money',
   }
 ];
 
 export default function MobileMoneyPayment() {
   const params = useLocalSearchParams();
   const {
-    appointmentId,
+    doctorId,
     doctorName,
     patientName,
+    patientAge,
     date,
     time,
     consultationType,
@@ -48,6 +52,337 @@ export default function MobileMoneyPayment() {
   } = params;
 
   const [selectedMethod, setSelectedMethod] = useState<string>('');
+  const [phoneNumber, setPhoneNumber] = useState<string>('');
+  const [loading, setLoading] = useState(false);
+  const [paymentInProgress, setPaymentInProgress] = useState(false);
+  const [paymentId, setPaymentId] = useState<string>('');
+
+  const formatPhoneNumber = (text: string) => {
+    // Supprimer tous les caractères non numériques
+    const cleaned = text.replace(/\D/g, '');
+    
+    // Limiter à 9 chiffres (format camerounais)
+    const limited = cleaned.substring(0, 9);
+    
+    return limited;
+  };
+
+  const validateCameroonPhone = (phone: string) => {
+    // Vérifier le format camerounais: 6XXXXXXXX (9 chiffres commençant par 6)
+    const regex = /^6[789]\d{7}$/;
+    return regex.test(phone);
+  };
+
+  const initiatePayment = async () => {
+    if (!selectedMethod) {
+      Alert.alert('Erreur', 'Veuillez sélectionner une méthode de paiement');
+      return;
+    }
+
+    if (!phoneNumber || !validateCameroonPhone(phoneNumber)) {
+      Alert.alert('Erreur', 'Numéro de téléphone invalide. Format: 6XXXXXXXX');
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const selectedProvider = PAYMENT_METHODS.find(m => m.id === selectedMethod);
+      
+      const paymentData = {
+        patient_name: patientName,
+        patient_phone: phoneNumber,
+        doctor_id: doctorId,
+        consultation_type: consultationType,
+        appointment_datetime: `${date} ${time}`,
+        payment_provider: selectedProvider?.provider,
+        notes: `Consultation ${consultationType} avec ${doctorName}`
+      };
+
+      console.log('Initiation paiement:', paymentData);
+
+      const response = await fetch(`/api/mobile-money/initiate`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(paymentData),
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setPaymentId(result.payment_id);
+        setPaymentInProgress(true);
+        
+        // Afficher les instructions de paiement
+        Alert.alert(
+          `Paiement ${result.provider}`,
+          result.message,
+          [
+            {
+              text: 'Instructions détaillées',
+              onPress: () => showPaymentInstructions(result.instructions)
+            },
+            {
+              text: 'J\'ai payé',
+              onPress: () => startPaymentMonitoring(result.payment_id)
+            }
+          ]
+        );
+      } else {
+        throw new Error(result.detail || 'Erreur lors de l\'initiation du paiement');
+      }
+    } catch (error) {
+      console.error('Erreur paiement:', error);
+      Alert.alert('Erreur', `Impossible d'initier le paiement: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const showPaymentInstructions = (instructions: string[]) => {
+    const instructionsText = instructions.join('\n');
+    Alert.alert(
+      'Instructions de paiement',
+      instructionsText,
+      [
+        {
+          text: 'J\'ai payé',
+          onPress: () => startPaymentMonitoring(paymentId)
+        }
+      ]
+    );
+  };
+
+  const startPaymentMonitoring = async (id: string) => {
+    setPaymentInProgress(true);
+    
+    // Vérifier le statut du paiement toutes les 3 secondes
+    const checkPaymentStatus = async () => {
+      try {
+        const selectedProvider = PAYMENT_METHODS.find(m => m.id === selectedMethod);
+        const response = await fetch(`/api/mobile-money/status/${id}?provider=${selectedProvider?.provider}`);
+        const result = await response.json();
+
+        console.log('Statut paiement:', result);
+
+        if (result.status === 'SUCCESSFUL') {
+          setPaymentInProgress(false);
+          Alert.alert(
+            'Paiement réussi ! 🎉',
+            'Votre rendez-vous est confirmé',
+            [
+              {
+                text: 'Voir confirmation',
+                onPress: () => {
+                  router.push({
+                    pathname: '/booking-confirmation',
+                    params: {
+                      doctorName,
+                      patientName,
+                      patientAge,
+                      appointmentDate: date,
+                      appointmentTime: time,
+                      consultationType,
+                      price: result.amount,
+                      paymentMethod: selectedProvider?.name,
+                      paymentId: id,
+                    },
+                  });
+                }
+              }
+            ]
+          );
+        } else if (result.status === 'FAILED') {
+          setPaymentInProgress(false);
+          Alert.alert('Paiement échoué', 'Le paiement a échoué. Veuillez réessayer.');
+        } else if (result.status === 'PENDING') {
+          // Continuer à vérifier
+          setTimeout(checkPaymentStatus, 3000);
+        }
+      } catch (error) {
+        console.error('Erreur vérification paiement:', error);
+        // Continuer à vérifier même en cas d'erreur réseau
+        setTimeout(checkPaymentStatus, 5000);
+      }
+    };
+
+    // Commencer la vérification
+    setTimeout(checkPaymentStatus, 2000);
+  };
+
+  const confirmPaymentManually = async () => {
+    if (!paymentId) return;
+
+    try {
+      const response = await fetch(`/api/mobile-money/confirm/${paymentId}`, {
+        method: 'POST',
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        setPaymentInProgress(false);
+        Alert.alert(
+          'Paiement confirmé ! 🎉',
+          'Votre rendez-vous est confirmé',
+          [
+            {
+              text: 'Voir confirmation',
+              onPress: () => {
+                router.push({
+                  pathname: '/booking-confirmation',
+                  params: {
+                    doctorName,
+                    patientName,
+                    patientAge,
+                    appointmentDate: date,
+                    appointmentTime: time,
+                    consultationType,
+                    price,
+                    paymentMethod: PAYMENT_METHODS.find(m => m.id === selectedMethod)?.name,
+                    paymentId,
+                  },
+                });
+              }
+            }
+          ]
+        );
+      } else {
+        Alert.alert('Erreur', result.message || 'Impossible de confirmer le paiement');
+      }
+    } catch (error) {
+      console.error('Erreur confirmation:', error);
+      Alert.alert('Erreur', 'Impossible de confirmer le paiement');
+    }
+  };
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#2E7D32" />
+      
+      {/* Header */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Paiement Mobile Money</Text>
+      </View>
+
+      <View style={styles.content}>
+        {/* Résumé de la consultation */}
+        <View style={styles.summaryCard}>
+          <Text style={styles.summaryTitle}>Résumé de la consultation</Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Médecin:</Text>
+            <Text style={styles.summaryValue}>{doctorName}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Patient:</Text>
+            <Text style={styles.summaryValue}>{patientName}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Date:</Text>
+            <Text style={styles.summaryValue}>{date} à {time}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Type:</Text>
+            <Text style={styles.summaryValue}>{consultationType}</Text>
+          </View>
+          <View style={[styles.summaryRow, styles.priceRow]}>
+            <Text style={styles.summaryLabel}>Montant:</Text>
+            <Text style={styles.priceValue}>{price} FCFA</Text>
+          </View>
+        </View>
+
+        {!paymentInProgress ? (
+          <>
+            {/* Numéro de téléphone */}
+            <View style={styles.phoneSection}>
+              <Text style={styles.sectionTitle}>Numéro de téléphone</Text>
+              <View style={styles.phoneInputContainer}>
+                <Text style={styles.phonePrefix}>+237 </Text>
+                <TextInput
+                  style={styles.phoneInput}
+                  value={phoneNumber}
+                  onChangeText={(text) => setPhoneNumber(formatPhoneNumber(text))}
+                  placeholder="6XXXXXXXX"
+                  keyboardType="numeric"
+                  maxLength={9}
+                />
+              </View>
+              <Text style={styles.phoneHint}>Format: 6XXXXXXXX (9 chiffres)</Text>
+            </View>
+
+            {/* Méthodes de paiement */}
+            <View style={styles.paymentSection}>
+              <Text style={styles.sectionTitle}>Choisir une méthode de paiement</Text>
+              
+              {PAYMENT_METHODS.map((method) => (
+                <TouchableOpacity
+                  key={method.id}
+                  style={[
+                    styles.paymentMethod,
+                    selectedMethod === method.id && styles.selectedMethod,
+                    { borderColor: method.color }
+                  ]}
+                  onPress={() => setSelectedMethod(method.id)}
+                >
+                  <View style={[styles.methodIcon, { backgroundColor: method.color }]}>
+                    <Ionicons name={method.icon as any} size={24} color="#333" />
+                  </View>
+                  <Text style={styles.methodName}>{method.name}</Text>
+                  <View style={styles.radioButton}>
+                    {selectedMethod === method.id && (
+                      <View style={[styles.radioButtonInner, { backgroundColor: method.color }]} />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Bouton de paiement */}
+            <TouchableOpacity 
+              style={[styles.payButton, (!selectedMethod || !phoneNumber || loading) && styles.payButtonDisabled]}
+              onPress={initiatePayment}
+              disabled={!selectedMethod || !phoneNumber || loading}
+            >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <Text style={styles.payButtonText}>Payer {price} FCFA</Text>
+                  <Ionicons name="card" size={20} color="white" />
+                </>
+              )}
+            </TouchableOpacity>
+          </>
+        ) : (
+          /* Interface de paiement en cours */
+          <View style={styles.paymentProgressContainer}>
+            <ActivityIndicator size="large" color="#2E7D32" />
+            <Text style={styles.progressTitle}>Paiement en cours...</Text>
+            <Text style={styles.progressText}>
+              Vérification du paiement Mobile Money
+            </Text>
+            <Text style={styles.progressSubtext}>
+              Cela peut prendre quelques secondes
+            </Text>
+            
+            {/* Bouton de confirmation manuelle pour les tests */}
+            <TouchableOpacity 
+              style={styles.manualConfirmButton}
+              onPress={confirmPaymentManually}
+            >
+              <Text style={styles.manualConfirmText}>Confirmer manuellement (Test)</Text>
+            </TouchableOpacity>
+          </View>
+        )}
+      </View>
+    </SafeAreaView>
+  );
+}
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [isProcessing, setIsProcessing] = useState(false);
   const [step, setStep] = useState<'select' | 'phone' | 'confirm' | 'processing'>('select');

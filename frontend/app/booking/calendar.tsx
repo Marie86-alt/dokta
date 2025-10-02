@@ -240,14 +240,20 @@ export default function BookingCalendarScreen() {
           }
         }
         
-        console.log('🔄 Navigation directe vers confirmation...');
+        console.log('🔄 Navigation vers paiement Mobile Money...');
         router.push({
-          pathname: '/booking-confirmation',
+          pathname: '/mobile-money-payment',
           params: {
-            appointmentId: appointment.id,
+            doctorId: doctorId as string,
             doctorName: doctorName as string,
             patientName: patientName as string,
+            patientAge: patientAge as string,
             date: selectedDate,
+            time: selectedTime,
+            consultationType: consultationType as string,
+            price: price as string,
+          },
+        });
             time: selectedTime,
             consultationType: consultationType as string,
             price: price as string,

@@ -260,6 +260,55 @@ export default function BookingConfirmation() {
           </View>
         </View>
 
+        {/* Payment Details */}
+        {paymentMethod && paymentId && (
+          <View style={styles.paymentCard}>
+            <Text style={styles.paymentTitle}>Informations de paiement</Text>
+            
+            <View style={styles.detailRow}>
+              <View style={styles.detailIcon}>
+                <Ionicons name="card" size={20} color="#27AE60" />
+              </View>
+              <View style={styles.detailContent}>
+                <Text style={styles.detailLabel}>Méthode de paiement</Text>
+                <Text style={styles.detailValue}>{paymentMethod}</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <View style={styles.detailIcon}>
+                <Ionicons name="checkmark-circle" size={20} color="#27AE60" />
+              </View>
+              <View style={styles.detailContent}>
+                <Text style={styles.detailLabel}>Statut du paiement</Text>
+                <Text style={[styles.detailValue, styles.paidStatus]}>Payé avec succès ✅</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <View style={styles.detailIcon}>
+                <Ionicons name="receipt" size={20} color="#27AE60" />
+              </View>
+              <View style={styles.detailContent}>
+                <Text style={styles.detailLabel}>ID de transaction</Text>
+                <Text style={styles.detailValue}>{paymentId.substring(0, 8)}...</Text>
+              </View>
+            </View>
+
+            <View style={styles.detailRow}>
+              <View style={styles.detailIcon}>
+                <Ionicons name="cash" size={20} color="#27AE60" />
+              </View>
+              <View style={styles.detailContent}>
+                <Text style={styles.detailLabel}>Montant payé</Text>
+                <Text style={[styles.detailValue, styles.paidAmount]}>
+                  {formatPrice(price as string)}
+                </Text>
+              </View>
+            </View>
+          </View>
+        )}
+
         {/* Instructions */}
         <View style={styles.instructionsCard}>
           <Text style={styles.instructionsTitle}>Instructions importantes</Text>

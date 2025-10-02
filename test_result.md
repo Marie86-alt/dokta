@@ -186,6 +186,18 @@ backend:
         agent: "testing"
         comment: "Tests complets d'authentification réussis (14/14 - 100%): ✅ API Root, ✅ Inscription Patient Camerounais (+237699XXXXXX), ✅ Inscription Médecin avec Spécialité/Tarifs, ✅ Validation Numéros Camerounais Invalides (6/6 rejetés), ✅ Prévention Doublons, ✅ Connexion Patient/Médecin, ✅ Échec Mauvais Credentials, ✅ Profil avec Token Valide, ✅ Échec sans Token/Token Invalide, ✅ Mise à jour Profil Patient/Médecin, ✅ Protection Champs Interdits. Système JWT sécurisé et fonctionnel avec validation camerounaise opérationnelle."
 
+  - task: "Système de paiement Mobile Money"
+    implemented: true
+    working: true
+    file: "server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: true
+        agent: "testing"
+        comment: "Tests complets du système Mobile Money réussis (9/9 - 100%): ✅ Initiation paiement MTN Mobile Money (15,000 FCFA), ✅ Initiation paiement Orange Money (45,000 FCFA pour domicile), ✅ Paiement téléconsultation (10,000 FCFA), ✅ Vérification statut paiement (PENDING → SUCCESSFUL), ✅ Confirmation manuelle paiement avec création rendez-vous automatique, ✅ Validation numéros camerounais invalides (5/5 rejetés correctement), ✅ Calcul tarifs par type consultation (cabinet: tarif de base, domicile: +10,000 FCFA, téléconsultation: -5,000 FCFA). Toutes les routes Mobile Money (/api/mobile-money/initiate, /api/mobile-money/status/{id}, /api/mobile-money/confirm/{id}) fonctionnent parfaitement avec données camerounaises réalistes. Système prêt pour production."
+
 frontend:
   - task: "Interface accueil Patient/Médecin"
     implemented: true

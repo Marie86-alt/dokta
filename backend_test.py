@@ -1,17 +1,17 @@
 #!/usr/bin/env python3
 """
-Tests complets pour les nouvelles fonctionnalités backend DOKTA
-Teste les APIs de créneaux disponibles, création de rendez-vous simplifiée, et intégration complète
+Tests pour le système de paiement Mobile Money DOKTA
+Test des nouvelles routes Mobile Money (MTN et Orange)
 """
 
 import requests
 import json
+import time
 from datetime import datetime, timedelta
-import sys
-import os
+import uuid
 
 # Configuration
-BACKEND_URL = "https://healthbook-cm.preview.emergentagent.com/api"
+BASE_URL = "https://healthbook-cm.preview.emergentagent.com/api"
 
 class DOKTABackendTester:
     def __init__(self):

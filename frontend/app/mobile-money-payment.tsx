@@ -442,6 +442,20 @@ export default function MobileMoneyPayment() {
           </View>
         )}
       </View>
+      
+      {/* Bouton de test TOUJOURS VISIBLE en dehors des conditions */}
+      <View style={{ padding: 16, backgroundColor: '#FFF3E0' }}>
+        <TouchableOpacity 
+          style={[styles.payButton, { backgroundColor: '#FF9800' }]}
+          onPress={() => {
+            console.log('🧪 Test Direct - force changement état');
+            setPaymentId('test_payment_direct_' + Date.now());
+            setPaymentInProgress(true);
+          }}
+        >
+          <Text style={styles.payButtonText}>🧪 Test Direct - Forcer Paiement</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

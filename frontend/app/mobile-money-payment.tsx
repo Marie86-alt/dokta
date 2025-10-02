@@ -418,6 +418,34 @@ export default function MobileMoneyPayment() {
           </View>
         )}
       </View>
+      
+      {/* Bouton de test temporaire - TOUJOURS VISIBLE */}
+      <View style={{ padding: 16 }}>
+        <TouchableOpacity 
+          style={[styles.payButton, { backgroundColor: '#FF9800' }]}
+          onPress={() => {
+            console.log('🧪 Test redirection vers confirmation...');
+            // Test direct de redirection vers confirmation avec données factices
+            router.push({
+              pathname: '/booking-confirmation',
+              params: {
+                appointmentId: 'test_appointment_123',
+                doctorName: 'Dr. Marie NGONO',
+                patientName: 'Patient Test',
+                patientAge: '30',
+                appointmentDate: '2025-10-04',
+                appointmentTime: '11:00',
+                consultationType: 'cabinet',
+                price: '15000',
+                paymentMethod: 'MTN Mobile Money',
+                paymentId: 'test_payment_123',
+              },
+            });
+          }}
+        >
+          <Text style={styles.payButtonText}>🧪 Test Confirmation (Temporaire)</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }

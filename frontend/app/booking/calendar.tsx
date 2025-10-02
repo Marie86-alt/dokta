@@ -216,19 +216,9 @@ export default function BookingCalendarScreen() {
           price: price as string,
         },
       });
-            time: selectedTime,
-            consultationType: consultationType as string,
-            price: price as string,
-          }
-        });
-      } else {
-        const errorData = await response.text();
-        console.error('❌ Erreur API:', errorData);
-        throw new Error('Erreur lors de la réservation');
-      }
     } catch (error) {
       console.error('💥 Erreur réservation:', error);
-      Alert.alert('Erreur', 'Impossible de confirmer le rendez-vous. Veuillez réessayer.');
+      Alert.alert('Erreur', 'Impossible de procéder au paiement. Veuillez réessayer.');
     } finally {
       console.log('🔚 Fin du processus - setLoading(false)');
       setLoading(false);

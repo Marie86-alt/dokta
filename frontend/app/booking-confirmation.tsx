@@ -278,7 +278,7 @@ export default function BookingConfirmation() {
         </View>
 
         {/* Payment Details */}
-        {paymentMethod && paymentId && (
+        {(paymentMethod || paymentId) && (
           <View style={styles.paymentCard}>
             <Text style={styles.paymentTitle}>Informations de paiement</Text>
             
@@ -288,7 +288,7 @@ export default function BookingConfirmation() {
               </View>
               <View style={styles.detailContent}>
                 <Text style={styles.detailLabel}>Méthode de paiement</Text>
-                <Text style={styles.detailValue}>{paymentMethod}</Text>
+                <Text style={styles.detailValue}>{paymentMethod || 'Mobile Money'}</Text>
               </View>
             </View>
 
@@ -302,15 +302,19 @@ export default function BookingConfirmation() {
               </View>
             </View>
 
-            <View style={styles.detailRow}>
-              <View style={styles.detailIcon}>
-                <Ionicons name="receipt" size={20} color="#27AE60" />
+            {paymentId && (
+              <View style={styles.detailRow}>
+                <View style={styles.detailIcon}>
+                  <Ionicons name="receipt" size={20} color="#27AE60" />
+                </View>
+                <View style={styles.detailContent}>
+                  <Text style={styles.detailLabel}>ID de transaction</Text>
+                  <Text style={styles.detailValue}>
+                    {typeof paymentId === 'string' ? paymentId.substring(0, 8) + '...' : 'Transaction confirmée'}
+                  </Text>
+                </View>
               </View>
-              <View style={styles.detailContent}>
-                <Text style={styles.detailLabel}>ID de transaction</Text>
-                <Text style={styles.detailValue}>{paymentId.substring(0, 8)}...</Text>
-              </View>
-            </View>
+            )}
 
             <View style={styles.detailRow}>
               <View style={styles.detailIcon}>

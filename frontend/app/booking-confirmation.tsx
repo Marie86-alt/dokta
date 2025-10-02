@@ -201,7 +201,7 @@ export default function BookingConfirmation() {
             <View style={styles.detailContent}>
               <Text style={styles.detailLabel}>Date & Heure</Text>
               <Text style={styles.detailValue}>
-                {new Date(date as string).toLocaleDateString('fr-FR')} à {time}
+                {new Date(finalDate as string).toLocaleDateString('fr-FR')} à {finalTime}
               </Text>
             </View>
           </View>

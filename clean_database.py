@@ -135,13 +135,8 @@ if __name__ == "__main__":
     print("🏥 === NETTOYAGE ET RESET DOKTA ===")
     print()
     
-    response = input("🤔 Confirmer la suppression de TOUTES les données? (oui/non): ")
-    if response.lower() in ['oui', 'o', 'yes', 'y']:
-        clean_dokta_database()
-        
-        print()
-        create_production = input("🤔 Créer des médecins professionnels? (oui/non): ")
-        if create_production.lower() in ['oui', 'o', 'yes', 'y']:
-            create_production_doctors()
-    else:
-        print("❌ Nettoyage annulé")
+    # Nettoyage automatique
+    clean_dokta_database()
+    print()
+    # Création des médecins professionnels
+    create_production_doctors()

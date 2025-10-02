@@ -41,17 +41,25 @@ const PAYMENT_METHODS: PaymentMethod[] = [
 export default function MobileMoneyPayment() {
   const params = useLocalSearchParams();
   
-  // Extraction plus robuste des paramètres
-  const doctorId = Array.isArray(params.doctorId) ? params.doctorId[0] : params.doctorId;
-  const doctorName = Array.isArray(params.doctorName) ? params.doctorName[0] : params.doctorName;
-  const patientName = Array.isArray(params.patientName) ? params.patientName[0] : params.patientName;
-  const patientAge = Array.isArray(params.patientAge) ? params.patientAge[0] : params.patientAge;
-  const date = Array.isArray(params.date) ? params.date[0] : params.date;
-  const time = Array.isArray(params.time) ? params.time[0] : params.time;
-  const consultationType = Array.isArray(params.consultationType) ? params.consultationType[0] : params.consultationType;
-  const price = Array.isArray(params.price) ? params.price[0] : params.price;
+  // Fonction pour décoder les paramètres URL
+  const decodeParam = (param: any): string | undefined => {
+    if (Array.isArray(param)) {
+      return param[0] ? decodeURIComponent(param[0]) : undefined;
+    }
+    return param ? decodeURIComponent(param) : undefined;
+  };
+  
+  // Extraction et décodage robuste des paramètres
+  const doctorId = decodeParam(params.doctorId);
+  const doctorName = decodeParam(params.doctorName);
+  const patientName = decodeParam(params.patientName);
+  const patientAge = decodeParam(params.patientAge);
+  const date = decodeParam(params.date);
+  const time = decodeParam(params.time);
+  const consultationType = decodeParam(params.consultationType);
+  const price = decodeParam(params.price);
 
-  console.log('📋 Paramètres Mobile Money reçus:', {
+  console.log('📋 Paramètres Mobile Money décodés:', {
     doctorId,
     doctorName,
     patientName,
@@ -66,14 +74,14 @@ export default function MobileMoneyPayment() {
   useEffect(() => {
     if (!doctorName || !patientName || !price) {
       console.warn('⚠️ Paramètres manquants détectés!');
-      console.log('Tous les paramètres reçus:', params);
+      console.log('Paramètres bruts reçus:', params);
       
-      // Pour les tests, utilisons des valeurs par défaut
-      if (!doctorName) console.log('❌ doctorName manquant');
-      if (!patientName) console.log('❌ patientName manquant');  
-      if (!price) console.log('❌ price manquant');
+      // Logs détaillés pour debug
+      if (!doctorName) console.log('❌ doctorName manquant ou mal décodé');
+      if (!patientName) console.log('❌ patientName manquant ou mal décodé');  
+      if (!price) console.log('❌ price manquant ou mal décodé');
     } else {
-      console.log('✅ Tous les paramètres requis sont présents');
+      console.log('✅ Tous les paramètres requis sont présents et décodés');
     }
   }, [doctorName, patientName, price, params]);
 

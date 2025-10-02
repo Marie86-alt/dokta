@@ -381,6 +381,9 @@ export default function MobileMoneyPayment() {
         )}
       </View>
     </SafeAreaView>
+  );
+}
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,

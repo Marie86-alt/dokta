@@ -584,4 +584,32 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#2E8B57',
   },
+  paymentCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderLeftWidth: 4,
+    borderLeftColor: '#27AE60',
+  },
+  paymentTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#27AE60',
+    marginBottom: 16,
+  },
+  paidStatus: {
+    color: '#27AE60',
+    fontWeight: 'bold',
+  },
+  paidAmount: {
+    color: '#27AE60',
+    fontWeight: 'bold',
+    fontSize: 18,
+  },
 });

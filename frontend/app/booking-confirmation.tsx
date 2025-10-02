@@ -21,11 +21,20 @@ export default function BookingConfirmation() {
     appointmentId,
     doctorName,
     patientName,
-    date,
-    time,
+    patientAge,
+    appointmentDate,
+    appointmentTime,
+    date, // Garder pour compatibilité
+    time, // Garder pour compatibilité
     consultationType,
-    price
+    price,
+    paymentMethod,
+    paymentId
   } = params;
+
+  // Utiliser les nouveaux noms de paramètres avec fallback
+  const finalDate = appointmentDate || date;
+  const finalTime = appointmentTime || time;
 
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);

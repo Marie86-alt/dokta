@@ -36,6 +36,23 @@ export default function BookingConfirmation() {
   const finalDate = appointmentDate || date;
   const finalTime = appointmentTime || time;
 
+  // Debug logs pour les paramètres de paiement
+  console.log('📋 Paramètres confirmation reçus:', {
+    appointmentId,
+    doctorName,
+    patientName,
+    paymentMethod,
+    paymentId,
+    price,
+  });
+
+  useEffect(() => {
+    console.log('🔍 Vérification conditions paiement:');
+    console.log('paymentMethod:', paymentMethod, typeof paymentMethod);
+    console.log('paymentId:', paymentId, typeof paymentId);
+    console.log('Condition affichage paiement:', !!(paymentMethod && paymentId));
+  }, [paymentMethod, paymentId]);
+
   const [userLocation, setUserLocation] = useState<LocationData | null>(null);
   const [loadingLocation, setLoadingLocation] = useState(false);
 

@@ -946,7 +946,7 @@ class MobileMoneyPayment(BaseModel):
     consultation_type: Literal["cabinet", "domicile", "teleconsultation"]
     appointment_datetime: str
     payment_provider: Literal["mtn_momo", "orange_money"]
-    notes: str = Field("", max_length=500)
+    notes: str = Field(default="", max_length=500)
 
 @api_router.post("/mobile-money/initiate")
 async def initiate_mobile_money_payment(payment_request: MobileMoneyPayment):

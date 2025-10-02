@@ -40,16 +40,16 @@ const PAYMENT_METHODS: PaymentMethod[] = [
 
 export default function MobileMoneyPayment() {
   const params = useLocalSearchParams();
-  const {
-    doctorId,
-    doctorName,
-    patientName,
-    patientAge,
-    date,
-    time,
-    consultationType,
-    price,
-  } = params;
+  
+  // Extraction plus robuste des paramètres
+  const doctorId = Array.isArray(params.doctorId) ? params.doctorId[0] : params.doctorId;
+  const doctorName = Array.isArray(params.doctorName) ? params.doctorName[0] : params.doctorName;
+  const patientName = Array.isArray(params.patientName) ? params.patientName[0] : params.patientName;
+  const patientAge = Array.isArray(params.patientAge) ? params.patientAge[0] : params.patientAge;
+  const date = Array.isArray(params.date) ? params.date[0] : params.date;
+  const time = Array.isArray(params.time) ? params.time[0] : params.time;
+  const consultationType = Array.isArray(params.consultationType) ? params.consultationType[0] : params.consultationType;
+  const price = Array.isArray(params.price) ? params.price[0] : params.price;
 
   console.log('📋 Paramètres Mobile Money reçus:', {
     doctorId,
@@ -66,12 +66,14 @@ export default function MobileMoneyPayment() {
   useEffect(() => {
     if (!doctorName || !patientName || !price) {
       console.warn('⚠️ Paramètres manquants détectés!');
-      console.log('Paramètres reçus:', Object.keys(params));
+      console.log('Tous les paramètres reçus:', params);
       
       // Pour les tests, utilisons des valeurs par défaut
       if (!doctorName) console.log('❌ doctorName manquant');
-      if (!patientName) console.log('❌ patientName manquant');
+      if (!patientName) console.log('❌ patientName manquant');  
       if (!price) console.log('❌ price manquant');
+    } else {
+      console.log('✅ Tous les paramètres requis sont présents');
     }
   }, [doctorName, patientName, price, params]);
 

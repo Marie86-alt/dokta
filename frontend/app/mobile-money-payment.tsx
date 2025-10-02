@@ -251,14 +251,14 @@ export default function MobileMoneyPayment() {
         setPaymentInProgress(false);
         console.log('✅ Paiement confirmé, redirection vers confirmation...');
         
-        // Redirection automatique vers la page récapitulative
+        // Préparer les paramètres avec des fallbacks
         const confirmationParams = {
-          appointmentId: result.appointment_id || 'manual_confirm', // ID du rendez-vous créé
-          doctorName: doctorName || 'Médecin',
+          appointmentId: result.appointment_id || `manual_${Date.now()}`,
+          doctorName: doctorName || 'Médecin DOKTA',
           patientName: patientName || 'Patient',
           patientAge: patientAge || '30',
-          appointmentDate: date || '2025-10-03',
-          appointmentTime: time || '10:30',
+          appointmentDate: date || new Date().toISOString().split('T')[0],
+          appointmentTime: time || '10:00',
           consultationType: consultationType || 'cabinet',
           price: price || '15000',
           paymentMethod: PAYMENT_METHODS.find(m => m.id === selectedMethod)?.name || 'MTN Mobile Money',
@@ -267,10 +267,14 @@ export default function MobileMoneyPayment() {
         
         console.log('📤 Paramètres de redirection:', confirmationParams);
         
-        router.push({
-          pathname: '/booking-confirmation',
-          params: confirmationParams,
-        });
+        // Utiliser router.replace pour une navigation plus propre
+        setTimeout(() => {
+          router.replace({
+            pathname: '/booking-confirmation',
+            params: confirmationParams,
+          });
+        }, 500); // Petit délai pour s'assurer que l'état est mis à jour
+        
       } else {
         console.error('❌ Erreur API confirmation:', result);
         Alert.alert('Erreur', result.message || 'Impossible de confirmer le paiement');

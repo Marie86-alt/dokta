@@ -201,59 +201,21 @@ export default function BookingCalendarScreen() {
         // Continue sans notifications
       }
       
-      console.log('📋 Préparation des données de réservation...');
-      const bookingData = {
-        doctor_id: doctorId,
-        patient_name: patientName,
-        patient_age: parseInt(patientAge as string),
-        date: selectedDate,
-        time: selectedTime,
-        consultation_type: consultationType,
-        price: parseInt(price as string),
-        user_id: 'anonymous', // Temporaire - sera remplacé par authentification
-        notification_token: notificationToken, // Inclure le token pour le backend
-      };
-
-      console.log('📤 Données de réservation:', bookingData);
-
-      const response = await fetch(`${EXPO_PUBLIC_BACKEND_URL}/api/appointments-simple`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      console.log('🔄 Navigation vers paiement Mobile Money...');
+      // Les données seront traitées lors de la confirmation du paiement
+      router.push({
+        pathname: '/mobile-money-payment',
+        params: {
+          doctorId: doctorId as string,
+          doctorName: doctorName as string,
+          patientName: patientName as string,
+          patientAge: patientAge as string,
+          date: selectedDate,
+          time: selectedTime,
+          consultationType: consultationType as string,
+          price: price as string,
         },
-        body: JSON.stringify(bookingData),
       });
-
-      console.log('📨 Réponse API status:', response.status);
-
-      if (response.ok) {
-        const appointment = await response.json();
-        console.log('✅ Rendez-vous créé:', appointment);
-        
-        // Programmer une notification de test pour démonstration
-        if (notificationToken) {
-          try {
-            await NotificationService.scheduleTestNotification(10); // Test dans 10 secondes
-            console.log('⏰ Notification de test programmée');
-          } catch (testError) {
-            console.error('❌ Erreur notification test:', testError);
-          }
-        }
-        
-        console.log('🔄 Navigation vers paiement Mobile Money...');
-        router.push({
-          pathname: '/mobile-money-payment',
-          params: {
-            doctorId: doctorId as string,
-            doctorName: doctorName as string,
-            patientName: patientName as string,
-            patientAge: patientAge as string,
-            date: selectedDate,
-            time: selectedTime,
-            consultationType: consultationType as string,
-            price: price as string,
-          },
-        });
             time: selectedTime,
             consultationType: consultationType as string,
             price: price as string,

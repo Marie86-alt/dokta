@@ -216,39 +216,52 @@ export default function MobileMoneyPayment() {
   };
 
   const confirmPaymentManually = async () => {
-    if (!paymentId) return;
+    if (!paymentId) {
+      console.error('❌ Pas de paymentId pour confirmation manuelle');
+      return;
+    }
+
+    console.log('🔄 Confirmation manuelle du paiement:', paymentId);
 
     try {
       const response = await fetch(`/api/mobile-money/confirm/${paymentId}`, {
         method: 'POST',
       });
 
+      console.log('📨 Réponse API confirmation:', response.status);
       const result = await response.json();
+      console.log('📋 Résultat confirmation:', result);
 
       if (response.ok) {
         setPaymentInProgress(false);
+        console.log('✅ Paiement confirmé, redirection vers confirmation...');
         
         // Redirection automatique vers la page récapitulative
+        const confirmationParams = {
+          appointmentId: result.appointment_id || 'manual_confirm', // ID du rendez-vous créé
+          doctorName: doctorName || 'Médecin',
+          patientName: patientName || 'Patient',
+          patientAge: patientAge || '30',
+          appointmentDate: date || '2025-10-03',
+          appointmentTime: time || '10:30',
+          consultationType: consultationType || 'cabinet',
+          price: price || '15000',
+          paymentMethod: PAYMENT_METHODS.find(m => m.id === selectedMethod)?.name || 'MTN Mobile Money',
+          paymentId: paymentId,
+        };
+        
+        console.log('📤 Paramètres de redirection:', confirmationParams);
+        
         router.push({
           pathname: '/booking-confirmation',
-          params: {
-            appointmentId: result.appointment_id, // ID du rendez-vous créé
-            doctorName,
-            patientName,
-            patientAge,
-            appointmentDate: date,
-            appointmentTime: time,
-            consultationType,
-            price,
-            paymentMethod: PAYMENT_METHODS.find(m => m.id === selectedMethod)?.name,
-            paymentId,
-          },
+          params: confirmationParams,
         });
       } else {
+        console.error('❌ Erreur API confirmation:', result);
         Alert.alert('Erreur', result.message || 'Impossible de confirmer le paiement');
       }
     } catch (error) {
-      console.error('Erreur confirmation:', error);
+      console.error('💥 Erreur confirmation:', error);
       Alert.alert('Erreur', 'Impossible de confirmer le paiement');
     }
   };

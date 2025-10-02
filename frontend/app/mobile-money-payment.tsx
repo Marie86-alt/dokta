@@ -391,9 +391,12 @@ export default function MobileMoneyPayment() {
 
             {/* Bouton de paiement */}
             <TouchableOpacity 
-              style={[styles.payButton, (!selectedMethod || !phoneNumber || loading) && styles.payButtonDisabled]}
-              onPress={initiatePayment}
-              disabled={!selectedMethod || !phoneNumber || loading}
+              style={[styles.payButton, loading && styles.payButtonDisabled]}
+              onPress={() => {
+                console.log('🎯 Clic bouton Payer détecté');
+                initiatePayment();
+              }}
+              disabled={loading}
             >
               {loading ? (
                 <ActivityIndicator color="white" />

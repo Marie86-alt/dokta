@@ -404,6 +404,14 @@ export default function MobileMoneyPayment() {
             <Text style={styles.progressSubtext}>
               Cela peut prendre quelques secondes
             </Text>
+            
+            {/* Bouton de confirmation manuelle pour les tests */}
+            <TouchableOpacity 
+              style={styles.manualConfirmButton}
+              onPress={confirmPaymentManually}
+            >
+              <Text style={styles.manualConfirmText}>Confirmer manuellement (Test)</Text>
+            </TouchableOpacity>
           </View>
         )}
       </View>

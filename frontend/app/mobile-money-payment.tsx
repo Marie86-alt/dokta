@@ -51,6 +51,17 @@ export default function MobileMoneyPayment() {
     price,
   } = params;
 
+  console.log('📋 Paramètres Mobile Money reçus:', {
+    doctorId,
+    doctorName,
+    patientName,
+    patientAge,
+    date,
+    time,
+    consultationType,
+    price,
+  });
+
   const [selectedMethod, setSelectedMethod] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [loading, setLoading] = useState(false);

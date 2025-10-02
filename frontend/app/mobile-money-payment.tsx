@@ -393,14 +393,11 @@ export default function MobileMoneyPayment() {
             <TouchableOpacity 
               style={styles.payButton}  // Toujours actif pour les tests
               onPress={() => {
-                console.log('🎯 Clic bouton Payer détecté');
-                // Force un numéro par défaut pour les tests
-                if (!phoneNumber) {
-                  setPhoneNumber('677123456');
-                }
-                setTimeout(() => {
-                  initiatePayment();
-                }, 100);
+                console.log('🎯 Clic bouton Payer - Test DIRECT de changement état');
+                // Changement d'état direct pour test
+                setPaymentId('test_direct_' + Date.now());
+                setPaymentInProgress(true);
+                console.log('✅ État changé directement - devrait aller vers page traitement');
               }}
             >
               {loading ? (

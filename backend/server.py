@@ -941,7 +941,7 @@ import uuid
 
 class MobileMoneyPayment(BaseModel):
     patient_name: str = Field(..., min_length=2, max_length=100)
-    patient_phone: str = Field(..., regex=r"^6[789]\d{7}$")  # Cameroun mobile format
+    patient_phone: str = Field(..., pattern=r"^6[789]\d{7}$")  # Cameroun mobile format
     doctor_id: str
     consultation_type: Literal["cabinet", "domicile", "teleconsultation"]
     appointment_datetime: str

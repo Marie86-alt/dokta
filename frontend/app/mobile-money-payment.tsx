@@ -235,31 +235,23 @@ export default function MobileMoneyPayment() {
 
       if (response.ok) {
         setPaymentInProgress(false);
-        Alert.alert(
-          'Paiement confirmé ! 🎉',
-          'Votre rendez-vous est confirmé',
-          [
-            {
-              text: 'Voir confirmation',
-              onPress: () => {
-                router.push({
-                  pathname: '/booking-confirmation',
-                  params: {
-                    doctorName,
-                    patientName,
-                    patientAge,
-                    appointmentDate: date,
-                    appointmentTime: time,
-                    consultationType,
-                    price,
-                    paymentMethod: PAYMENT_METHODS.find(m => m.id === selectedMethod)?.name,
-                    paymentId,
-                  },
-                });
-              }
-            }
-          ]
-        );
+        
+        // Redirection automatique vers la page récapitulative
+        router.push({
+          pathname: '/booking-confirmation',
+          params: {
+            appointmentId: result.appointment_id, // ID du rendez-vous créé
+            doctorName,
+            patientName,
+            patientAge,
+            appointmentDate: date,
+            appointmentTime: time,
+            consultationType,
+            price,
+            paymentMethod: PAYMENT_METHODS.find(m => m.id === selectedMethod)?.name,
+            paymentId,
+          },
+        });
       } else {
         Alert.alert('Erreur', result.message || 'Impossible de confirmer le paiement');
       }

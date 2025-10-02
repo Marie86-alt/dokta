@@ -930,6 +930,190 @@ async def migration_status():
             "message": f"❌ Erreur statut: {str(e)}"
         }
 
+# ===============================================
+# MOBILE MONEY PAYMENT ROUTES (MTN & ORANGE)
+# ===============================================
+
+from pydantic import BaseModel, Field, validator
+from typing import Literal
+from datetime import datetime, timedelta
+import uuid
+
+class MobileMoneyPayment(BaseModel):
+    patient_name: str = Field(..., min_length=2, max_length=100)
+    patient_phone: str = Field(..., regex=r"^6[789]\d{7}$")  # Cameroun mobile format
+    doctor_id: str
+    consultation_type: Literal["cabinet", "domicile", "teleconsultation"]
+    appointment_datetime: str
+    payment_provider: Literal["mtn_momo", "orange_money"]
+    notes: str = Field("", max_length=500)
+
+@api_router.post("/mobile-money/initiate")
+async def initiate_mobile_money_payment(payment_request: MobileMoneyPayment):
+    """Initier un paiement Mobile Money (MTN ou Orange)"""
+    try:
+        # Récupérer les détails du médecin pour le tarif
+        doctor = await db.doctors.find_one({"id": payment_request.doctor_id})
+        if not doctor:
+            raise HTTPException(status_code=404, detail="Médecin non trouvé")
+        
+        # Calculer le montant selon le type de consultation
+        tarifs = {
+            "cabinet": doctor["tarif"],
+            "domicile": doctor.get("tarif_domicile", doctor["tarif"] + 10000),
+            "teleconsultation": doctor.get("tarif_teleconsultation", doctor["tarif"] - 5000)
+        }
+        
+        amount = tarifs[payment_request.consultation_type]
+        reference_id = str(uuid.uuid4())
+        
+        # Créer l'enregistrement de paiement
+        payment_record = {
+            "id": reference_id,
+            "patient_name": payment_request.patient_name,
+            "patient_phone": payment_request.patient_phone,
+            "doctor_id": payment_request.doctor_id,
+            "consultation_type": payment_request.consultation_type,
+            "appointment_datetime": payment_request.appointment_datetime,
+            "amount": amount,
+            "currency": "XAF",
+            "payment_provider": payment_request.payment_provider,
+            "status": "PENDING",
+            "created_at": datetime.utcnow().isoformat(),
+            "expires_at": (datetime.utcnow() + timedelta(minutes=10)).isoformat()
+        }
+        
+        await db.mobile_payments.insert_one(payment_record)
+        
+        if payment_request.payment_provider == "mtn_momo":
+            # Traitement MTN Mobile Money
+            return {
+                "payment_id": reference_id,
+                "status": "PENDING",
+                "provider": "MTN Mobile Money",
+                "amount": amount,
+                "currency": "XAF",
+                "message": f"Composez *126# et suivez les instructions pour payer {amount} FCFA",
+                "instructions": [
+                    f"1. Composez *126# sur votre téléphone",
+                    f"2. Sélectionnez 'Payer facture'", 
+                    f"3. Entrez le code marchand: DOKTA",
+                    f"4. Entrez le montant: {amount}",
+                    f"5. Confirmez avec votre code PIN"
+                ]
+            }
+        
+        elif payment_request.payment_provider == "orange_money":
+            # Traitement Orange Money
+            return {
+                "payment_id": reference_id,
+                "status": "PENDING", 
+                "provider": "Orange Money",
+                "amount": amount,
+                "currency": "XAF",
+                "message": f"Composez #144# et suivez les instructions pour payer {amount} FCFA",
+                "instructions": [
+                    f"1. Composez #144# sur votre téléphone",
+                    f"2. Sélectionnez 'Paiement marchand'",
+                    f"3. Entrez le code DOKTA",
+                    f"4. Entrez le montant: {amount}",
+                    f"5. Confirmez avec votre code Orange Money"
+                ]
+            }
+        
+    except Exception as e:
+        print(f"Erreur initiation paiement: {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur lors de l'initiation du paiement: {str(e)}")
+
+@api_router.get("/mobile-money/status/{payment_id}")
+async def check_mobile_money_status(payment_id: str):
+    """Vérifier le statut d'un paiement Mobile Money"""
+    try:
+        payment = await db.mobile_payments.find_one({"id": payment_id})
+        
+        if not payment:
+            raise HTTPException(status_code=404, detail="Paiement non trouvé")
+        
+        # Simuler la vérification du statut (en production, on appellerait les APIs MTN/Orange)
+        # Pour le développement, on peut simuler des changements de statut
+        
+        current_time = datetime.utcnow()
+        created_time = datetime.fromisoformat(payment["created_at"])
+        elapsed_minutes = (current_time - created_time).total_seconds() / 60
+        
+        # Simuler un changement de statut après 2 minutes pour les tests
+        if elapsed_minutes > 2 and payment["status"] == "PENDING":
+            # Simuler succès pour les tests (70% de succès)
+            import random
+            success = random.random() > 0.3
+            
+            new_status = "SUCCESSFUL" if success else "FAILED"
+            
+            await db.mobile_payments.update_one(
+                {"id": payment_id},
+                {"$set": {"status": new_status, "completed_at": current_time.isoformat()}}
+            )
+            
+            payment["status"] = new_status
+        
+        return {
+            "payment_id": payment_id,
+            "status": payment["status"],
+            "amount": payment["amount"],
+            "currency": payment["currency"],
+            "provider": payment["payment_provider"],
+            "created_at": payment["created_at"],
+            "completed_at": payment.get("completed_at")
+        }
+        
+    except Exception as e:
+        print(f"Erreur vérification statut: {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la vérification: {str(e)}")
+
+@api_router.post("/mobile-money/confirm/{payment_id}")
+async def confirm_mobile_money_payment(payment_id: str):
+    """Confirmer manuellement un paiement (pour les tests)"""
+    try:
+        payment = await db.mobile_payments.find_one({"id": payment_id})
+        
+        if not payment:
+            raise HTTPException(status_code=404, detail="Paiement non trouvé")
+        
+        if payment["status"] != "PENDING":
+            return {"message": f"Paiement déjà {payment['status']}"}
+        
+        # Marquer comme réussi
+        await db.mobile_payments.update_one(
+            {"id": payment_id},
+            {"$set": {"status": "SUCCESSFUL", "completed_at": datetime.utcnow().isoformat()}}
+        )
+        
+        # Créer le rendez-vous confirmé
+        appointment = {
+            "id": str(uuid.uuid4()),
+            "patient_name": payment["patient_name"],
+            "patient_phone": payment["patient_phone"],
+            "doctor_id": payment["doctor_id"],
+            "consultation_type": payment["consultation_type"],
+            "appointment_datetime": payment["appointment_datetime"],
+            "amount": payment["amount"],
+            "payment_id": payment_id,
+            "status": "confirmed",
+            "created_at": datetime.utcnow().isoformat()
+        }
+        
+        await db.appointments.insert_one(appointment)
+        
+        return {
+            "message": "Paiement confirmé avec succès",
+            "payment_status": "SUCCESSFUL",
+            "appointment_id": appointment["id"]
+        }
+        
+    except Exception as e:
+        print(f"Erreur confirmation paiement: {e}")
+        raise HTTPException(status_code=500, detail=f"Erreur lors de la confirmation: {str(e)}")
+
 # Include the router in the main app
 app.include_router(api_router)
 

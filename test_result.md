@@ -299,7 +299,6 @@ test_plan:
   current_focus:
     - "Calendrier de réservation"
     - "Formulaire réservation patient"
-    - "Paiement Mobile Money"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"

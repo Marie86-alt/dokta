@@ -391,12 +391,29 @@ export default function MobileMoneyPayment() {
               Cela peut prendre quelques secondes
             </Text>
             
-            {/* Bouton de confirmation manuelle pour les tests */}
+            {/* Bouton de test temporaire */}
             <TouchableOpacity 
-              style={styles.manualConfirmButton}
-              onPress={confirmPaymentManually}
+              style={[styles.payButton, { backgroundColor: '#FF9800', marginTop: 20 }]}
+              onPress={() => {
+                // Test direct de redirection vers confirmation avec données factices
+                router.push({
+                  pathname: '/booking-confirmation',
+                  params: {
+                    appointmentId: 'test_appointment_123',
+                    doctorName: 'Dr. Marie NGONO',
+                    patientName: 'Patient Test',
+                    patientAge: '30',
+                    appointmentDate: '2025-10-04',
+                    appointmentTime: '11:00',
+                    consultationType: 'cabinet',
+                    price: '15000',
+                    paymentMethod: 'MTN Mobile Money',
+                    paymentId: 'test_payment_123',
+                  },
+                });
+              }}
             >
-              <Text style={styles.manualConfirmText}>Confirmer manuellement (Test)</Text>
+              <Text style={styles.payButtonText}>🧪 Test Confirmation (Temporaire)</Text>
             </TouchableOpacity>
           </View>
         )}

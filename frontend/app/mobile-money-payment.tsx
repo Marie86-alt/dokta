@@ -108,20 +108,26 @@ export default function MobileMoneyPayment() {
   };
 
   const initiatePayment = async () => {
+    console.log('🔄 Début de initiatePayment()');
+    
     if (!selectedMethod) {
+      console.error('❌ Pas de méthode sélectionnée');
       Alert.alert('Erreur', 'Veuillez sélectionner une méthode de paiement');
       return;
     }
 
     if (!phoneNumber || !validateCameroonPhone(phoneNumber)) {
+      console.error('❌ Numéro de téléphone invalide:', phoneNumber);
       Alert.alert('Erreur', 'Numéro de téléphone invalide. Format: 6XXXXXXXX');
       return;
     }
 
+    console.log('✅ Validation passée, début du paiement...');
     setLoading(true);
 
     try {
       const selectedProvider = PAYMENT_METHODS.find(m => m.id === selectedMethod);
+      console.log('🏪 Provider sélectionné:', selectedProvider);
       
       const paymentData = {
         patient_name: patientName,
@@ -133,7 +139,7 @@ export default function MobileMoneyPayment() {
         notes: `Consultation ${consultationType} avec ${doctorName}`
       };
 
-      console.log('Initiation paiement:', paymentData);
+      console.log('📤 Données de paiement à envoyer:', paymentData);
 
       const response = await fetch(`/api/mobile-money/initiate`, {
         method: 'POST',
@@ -143,11 +149,15 @@ export default function MobileMoneyPayment() {
         body: JSON.stringify(paymentData),
       });
 
+      console.log('📨 Réponse serveur status:', response.status);
       const result = await response.json();
+      console.log('📋 Résultat serveur:', result);
 
       if (response.ok) {
+        console.log('✅ Paiement initié avec succès');
         setPaymentId(result.payment_id);
         setPaymentInProgress(true);
+        console.log('🔄 État mis à jour: paymentInProgress = true, paymentId =', result.payment_id);
         
         // Afficher les instructions de paiement
         Alert.alert(
@@ -165,12 +175,14 @@ export default function MobileMoneyPayment() {
           ]
         );
       } else {
+        console.error('❌ Erreur serveur:', result);
         throw new Error(result.detail || 'Erreur lors de l\'initiation du paiement');
       }
     } catch (error) {
-      console.error('Erreur paiement:', error);
+      console.error('💥 Erreur catch:', error);
       Alert.alert('Erreur', `Impossible d'initier le paiement: ${error.message}`);
     } finally {
+      console.log('🔚 Fin de initiatePayment, setLoading(false)');
       setLoading(false);
     }
   };

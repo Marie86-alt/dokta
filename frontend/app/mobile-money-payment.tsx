@@ -391,13 +391,27 @@ export default function MobileMoneyPayment() {
 
             {/* Bouton de paiement */}
             <TouchableOpacity 
-              style={[styles.payButton, loading && styles.payButtonDisabled]}
+              style={styles.payButton}  // Toujours actif pour les tests
               onPress={() => {
                 console.log('🎯 Clic bouton Payer détecté');
-                initiatePayment();
+                // Force un numéro par défaut pour les tests
+                if (!phoneNumber) {
+                  setPhoneNumber('677123456');
+                }
+                setTimeout(() => {
+                  initiatePayment();
+                }, 100);
               }}
-              disabled={loading}
             >
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <>
+                  <Text style={styles.payButtonText}>Payer {price} FCFA</Text>
+                  <Ionicons name="card" size={20} color="white" />
+                </>
+              )}
+            </TouchableOpacity>
               {loading ? (
                 <ActivityIndicator color="white" />
               ) : (

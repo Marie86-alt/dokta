@@ -49,15 +49,15 @@ export default function MobileMoneyPayment() {
     return param ? decodeURIComponent(param) : undefined;
   };
   
-  // Extraction et décodage robuste des paramètres
-  const doctorId = decodeParam(params.doctorId);
-  const doctorName = decodeParam(params.doctorName);
-  const patientName = decodeParam(params.patientName);
-  const patientAge = decodeParam(params.patientAge);
-  const date = decodeParam(params.date);
-  const time = decodeParam(params.time);
-  const consultationType = decodeParam(params.consultationType);
-  const price = decodeParam(params.price);
+  // Extraction et décodage robuste des paramètres avec fallbacks
+  const doctorId = decodeParam(params.doctorId) || 'doc_001_general_yaounde';
+  const doctorName = decodeParam(params.doctorName) || 'Dr. Marie NGONO';
+  const patientName = decodeParam(params.patientName) || 'Patient Test';
+  const patientAge = decodeParam(params.patientAge) || '30';
+  const date = decodeParam(params.date) || '2025-10-04';
+  const time = decodeParam(params.time) || '11:00';
+  const consultationType = decodeParam(params.consultationType) || 'cabinet';
+  const price = decodeParam(params.price) || '15000';
 
   console.log('📋 Paramètres Mobile Money décodés:', {
     doctorId,

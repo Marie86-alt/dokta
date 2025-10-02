@@ -13,443 +13,434 @@ import uuid
 # Configuration
 BASE_URL = "https://healthbook-cm.preview.emergentagent.com/api"
 
-class DOKTABackendTester:
+class Colors:
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    END = '\033[0m'
+
+def print_success(message):
+    print(f"{Colors.GREEN}✅ {message}{Colors.END}")
+
+def print_error(message):
+    print(f"{Colors.RED}❌ {message}{Colors.END}")
+
+def print_info(message):
+    print(f"{Colors.BLUE}ℹ️  {message}{Colors.END}")
+
+def print_warning(message):
+    print(f"{Colors.YELLOW}⚠️  {message}{Colors.END}")
+
+class MobileMoneyTester:
     def __init__(self):
-        self.base_url = BACKEND_URL
-        self.test_results = []
-        self.doctor_id = None
-        self.appointment_id = None
+        self.base_url = BASE_URL
+        self.session = requests.Session()
+        self.doctors = []
+        self.payment_ids = []
         
-    def log_test(self, test_name, success, details="", response_data=None):
-        """Enregistrer le résultat d'un test"""
-        status = "✅ PASS" if success else "❌ FAIL"
-        print(f"{status} {test_name}")
-        if details:
-            print(f"   {details}")
-        if response_data and not success:
-            print(f"   Response: {response_data}")
-        print()
-        
-        self.test_results.append({
-            "test": test_name,
-            "success": success,
-            "details": details,
-            "response": response_data
-        })
-    
-    def test_api_root(self):
-        """Test de l'API racine"""
+    def test_api_connection(self):
+        """Test de connexion à l'API"""
         try:
-            response = requests.get(f"{self.base_url}/")
+            response = self.session.get(f"{self.base_url}/")
             if response.status_code == 200:
-                data = response.json()
-                self.log_test("API Root", True, f"Message: {data.get('message', 'N/A')}")
+                print_success("Connexion API réussie")
                 return True
             else:
-                self.log_test("API Root", False, f"Status: {response.status_code}", response.text)
+                print_error(f"Échec connexion API: {response.status_code}")
                 return False
         except Exception as e:
-            self.log_test("API Root", False, f"Erreur: {str(e)}")
+            print_error(f"Erreur connexion API: {e}")
             return False
     
-    def test_get_doctors(self):
-        """Test récupération liste des médecins"""
+    def get_doctors(self):
+        """Récupérer la liste des médecins"""
         try:
-            response = requests.get(f"{self.base_url}/doctors")
+            response = self.session.get(f"{self.base_url}/doctors")
             if response.status_code == 200:
-                doctors = response.json()
-                if doctors and len(doctors) > 0:
-                    # Stocker l'ID du premier médecin pour les tests suivants
-                    self.doctor_id = doctors[0]["id"]
-                    doctor_names = [d["nom"] for d in doctors[:3]]
-                    self.log_test("GET Doctors", True, f"Trouvé {len(doctors)} médecins: {', '.join(doctor_names)}")
-                    return True
-                else:
-                    self.log_test("GET Doctors", False, "Aucun médecin trouvé")
-                    return False
-            else:
-                self.log_test("GET Doctors", False, f"Status: {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("GET Doctors", False, f"Erreur: {str(e)}")
-            return False
-    
-    def test_get_specialties(self):
-        """Test récupération des spécialités"""
-        try:
-            response = requests.get(f"{self.base_url}/specialties")
-            if response.status_code == 200:
-                specialties = response.json()
-                if specialties and len(specialties) > 0:
-                    specialty_names = [s["label"] for s in specialties[:3]]
-                    self.log_test("GET Specialties", True, f"Trouvé {len(specialties)} spécialités: {', '.join(specialty_names)}")
-                    return True
-                else:
-                    self.log_test("GET Specialties", False, "Aucune spécialité trouvée")
-                    return False
-            else:
-                self.log_test("GET Specialties", False, f"Status: {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("GET Specialties", False, f"Erreur: {str(e)}")
-            return False
-    
-    def test_search_api(self):
-        """Test de l'API de recherche globale"""
-        try:
-            # Test recherche médecin
-            response = requests.get(f"{self.base_url}/search?q=Marie")
-            if response.status_code == 200:
-                results = response.json()
-                if results.get("results"):
-                    doctor_results = [r for r in results["results"] if r["type"] == "doctor"]
-                    self.log_test("Search API - Médecins", True, f"Trouvé {len(doctor_results)} médecin(s) pour 'Marie'")
-                else:
-                    self.log_test("Search API - Médecins", True, "Aucun résultat pour 'Marie' (normal si pas de Dr Marie)")
+                self.doctors = response.json()
+                print_success(f"Récupération de {len(self.doctors)} médecins")
                 
-                # Test recherche spécialité
-                response2 = requests.get(f"{self.base_url}/search?q=Cardio")
-                if response2.status_code == 200:
-                    results2 = response2.json()
-                    specialty_results = [r for r in results2.get("results", []) if r["type"] == "specialty"]
-                    self.log_test("Search API - Spécialités", True, f"Trouvé {len(specialty_results)} spécialité(s) pour 'Cardio'")
-                    return True
-                else:
-                    self.log_test("Search API - Spécialités", False, f"Status: {response2.status_code}")
-                    return False
+                # Afficher les médecins disponibles
+                for doctor in self.doctors:
+                    print_info(f"  - {doctor['nom']} ({doctor['specialite']}) - {doctor['tarif']:,} FCFA")
+                return True
             else:
-                self.log_test("Search API", False, f"Status: {response.status_code}", response.text)
+                print_error(f"Échec récupération médecins: {response.status_code}")
                 return False
         except Exception as e:
-            self.log_test("Search API", False, f"Erreur: {str(e)}")
+            print_error(f"Erreur récupération médecins: {e}")
             return False
     
-    def test_available_slots(self, test_date="2024-12-27"):
-        """Test PRIORITAIRE: API créneaux disponibles par médecin"""
-        if not self.doctor_id:
-            self.log_test("Available Slots", False, "Pas d'ID médecin disponible")
-            return False
-            
-        try:
-            url = f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}"
-            response = requests.get(url)
-            
-            if response.status_code == 200:
-                slots = response.json()
-                if isinstance(slots, list) and len(slots) > 0:
-                    available_count = sum(1 for slot in slots if slot.get("disponible", False))
-                    total_count = len(slots)
-                    sample_slots = [slot["heure"] for slot in slots[:5]]
-                    
-                    self.log_test(
-                        f"Available Slots - {test_date}", 
-                        True, 
-                        f"{available_count}/{total_count} créneaux disponibles. Exemples: {', '.join(sample_slots)}"
-                    )
-                    return True
-                else:
-                    self.log_test("Available Slots", False, "Aucun créneau retourné ou format invalide", slots)
-                    return False
-            elif response.status_code == 404:
-                self.log_test("Available Slots", False, "Médecin non trouvé", response.text)
-                return False
-            else:
-                self.log_test("Available Slots", False, f"Status: {response.status_code}", response.text)
-                return False
-        except Exception as e:
-            self.log_test("Available Slots", False, f"Erreur: {str(e)}")
-            return False
-    
-    def test_available_slots_different_dates(self):
-        """Test créneaux disponibles avec différentes dates"""
-        if not self.doctor_id:
-            return False
-            
-        test_dates = [
-            "2024-12-27",
-            "2024-12-28", 
-            "2025-01-02"
-        ]
+    def test_mtn_payment_initiation(self):
+        """Test d'initiation paiement MTN Mobile Money"""
+        print_info("=== TEST INITIATION PAIEMENT MTN MOBILE MONEY ===")
         
-        success_count = 0
-        for test_date in test_dates:
-            if self.test_available_slots(test_date):
-                success_count += 1
-        
-        overall_success = success_count == len(test_dates)
-        self.log_test(
-            "Available Slots - Dates multiples", 
-            overall_success, 
-            f"{success_count}/{len(test_dates)} dates testées avec succès"
-        )
-        return overall_success
-    
-    def test_create_appointment_simple(self):
-        """Test PRIORITAIRE: API création rendez-vous simplifiée"""
-        if not self.doctor_id:
-            self.log_test("Create Appointment Simple", False, "Pas d'ID médecin disponible")
+        if not self.doctors:
+            print_error("Aucun médecin disponible pour le test")
             return False
-            
+        
+        # Utiliser Dr. Marie NGONO (premier médecin)
+        doctor = self.doctors[0]
+        
+        payment_data = {
+            "patient_name": "Marie Kamga",
+            "patient_phone": "677123456",  # Numéro camerounais valide
+            "doctor_id": doctor["id"],
+            "consultation_type": "cabinet",
+            "appointment_datetime": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M"),
+            "payment_provider": "mtn_momo",
+            "notes": "Consultation de routine"
+        }
+        
         try:
-            appointment_data = {
-                "doctor_id": self.doctor_id,
-                "patient_name": "Amadou Nkomo",
-                "patient_age": 28,
-                "date": "2024-12-27",
-                "time": "14:00",  # Changed to a different time slot
-                "consultation_type": "cabinet",
-                "price": 15000,
-                "user_id": "test_user_cameroun_123"
-            }
-            
-            response = requests.post(
-                f"{self.base_url}/appointments-simple",
-                json=appointment_data,
+            response = self.session.post(
+                f"{self.base_url}/mobile-money/initiate",
+                json=payment_data,
                 headers={"Content-Type": "application/json"}
             )
             
             if response.status_code == 200:
                 result = response.json()
-                if result.get("id") and result.get("status") == "confirmed":
-                    self.appointment_id = result["id"]
-                    self.log_test(
-                        "Create Appointment Simple", 
-                        True, 
-                        f"Rendez-vous créé: ID={result['id'][:8]}..., Status={result['status']}"
-                    )
-                    return True
-                else:
-                    self.log_test("Create Appointment Simple", False, "Réponse invalide", result)
-                    return False
+                payment_id = result.get("payment_id")
+                self.payment_ids.append(payment_id)
+                
+                print_success(f"Initiation MTN réussie - ID: {payment_id}")
+                print_info(f"  Provider: {result.get('provider')}")
+                print_info(f"  Montant: {result.get('amount'):,} {result.get('currency')}")
+                print_info(f"  Message: {result.get('message')}")
+                print_info("  Instructions:")
+                for i, instruction in enumerate(result.get('instructions', []), 1):
+                    print_info(f"    {i}. {instruction}")
+                
+                return True
             else:
-                self.log_test("Create Appointment Simple", False, f"Status: {response.status_code}", response.text)
+                print_error(f"Échec initiation MTN: {response.status_code} - {response.text}")
                 return False
-        except Exception as e:
-            self.log_test("Create Appointment Simple", False, f"Erreur: {str(e)}")
-            return False
-    
-    def test_appointment_validation(self):
-        """Test validations création rendez-vous"""
-        if not self.doctor_id:
-            return False
-            
-        # Test données manquantes
-        try:
-            incomplete_data = {
-                "doctor_id": self.doctor_id,
-                "patient_name": "Test Patient"
-                # Données manquantes intentionnellement
-            }
-            
-            response = requests.post(
-                f"{self.base_url}/appointments-simple",
-                json=incomplete_data,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            # On s'attend à une erreur pour données incomplètes
-            if response.status_code >= 400:
-                self.log_test("Appointment Validation - Données manquantes", True, f"Erreur attendue: {response.status_code}")
-            else:
-                self.log_test("Appointment Validation - Données manquantes", False, "Devrait rejeter les données incomplètes")
                 
         except Exception as e:
-            self.log_test("Appointment Validation", False, f"Erreur: {str(e)}")
+            print_error(f"Erreur initiation MTN: {e}")
+            return False
+    
+    def test_orange_payment_initiation(self):
+        """Test d'initiation paiement Orange Money"""
+        print_info("=== TEST INITIATION PAIEMENT ORANGE MONEY ===")
+        
+        if not self.doctors:
+            print_error("Aucun médecin disponible pour le test")
             return False
         
-        return True
-    
-    def test_double_booking_prevention(self):
-        """Test PRIORITAIRE: Prévention double réservation"""
-        if not self.doctor_id:
-            return False
-            
+        # Utiliser Dr. Jean MBARGA (deuxième médecin)
+        doctor = self.doctors[1] if len(self.doctors) > 1 else self.doctors[0]
+        
+        payment_data = {
+            "patient_name": "Jean Nkomo",
+            "patient_phone": "690123456",  # Numéro camerounais valide
+            "doctor_id": doctor["id"],
+            "consultation_type": "domicile",
+            "appointment_datetime": (datetime.now() + timedelta(days=2)).strftime("%Y-%m-%d %H:%M"),
+            "payment_provider": "orange_money",
+            "notes": "Visite à domicile"
+        }
+        
         try:
-            # Créer un premier rendez-vous
-            appointment_data = {
-                "doctor_id": self.doctor_id,
-                "patient_name": "Patient Test 1",
-                "patient_age": 30,
-                "date": "2024-12-27",
-                "time": "15:00",  # Changed to a different time slot
-                "consultation_type": "cabinet",
-                "price": 15000,
-                "user_id": "test_user_1"
-            }
-            
-            response1 = requests.post(
-                f"{self.base_url}/appointments-simple",
-                json=appointment_data,
+            response = self.session.post(
+                f"{self.base_url}/mobile-money/initiate",
+                json=payment_data,
                 headers={"Content-Type": "application/json"}
             )
             
-            if response1.status_code == 200:
-                # Essayer de créer un deuxième rendez-vous au même créneau
-                appointment_data["patient_name"] = "Patient Test 2"
-                appointment_data["user_id"] = "test_user_2"
+            if response.status_code == 200:
+                result = response.json()
+                payment_id = result.get("payment_id")
+                self.payment_ids.append(payment_id)
                 
-                response2 = requests.post(
-                    f"{self.base_url}/appointments-simple",
-                    json=appointment_data,
+                print_success(f"Initiation Orange réussie - ID: {payment_id}")
+                print_info(f"  Provider: {result.get('provider')}")
+                print_info(f"  Montant: {result.get('amount'):,} {result.get('currency')}")
+                print_info(f"  Message: {result.get('message')}")
+                print_info("  Instructions:")
+                for i, instruction in enumerate(result.get('instructions', []), 1):
+                    print_info(f"    {i}. {instruction}")
+                
+                return True
+            else:
+                print_error(f"Échec initiation Orange: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            print_error(f"Erreur initiation Orange: {e}")
+            return False
+    
+    def test_teleconsultation_payment(self):
+        """Test paiement pour téléconsultation"""
+        print_info("=== TEST PAIEMENT TÉLÉCONSULTATION ===")
+        
+        if not self.doctors:
+            print_error("Aucun médecin disponible pour le test")
+            return False
+        
+        # Utiliser Dr. Grace FOUDA (troisième médecin)
+        doctor = self.doctors[2] if len(self.doctors) > 2 else self.doctors[0]
+        
+        payment_data = {
+            "patient_name": "Grace Mballa",
+            "patient_phone": "699123456",  # Numéro camerounais valide
+            "doctor_id": doctor["id"],
+            "consultation_type": "teleconsultation",
+            "appointment_datetime": (datetime.now() + timedelta(hours=4)).strftime("%Y-%m-%d %H:%M"),
+            "payment_provider": "mtn_momo",
+            "notes": "Consultation en ligne"
+        }
+        
+        try:
+            response = self.session.post(
+                f"{self.base_url}/mobile-money/initiate",
+                json=payment_data,
+                headers={"Content-Type": "application/json"}
+            )
+            
+            if response.status_code == 200:
+                result = response.json()
+                payment_id = result.get("payment_id")
+                self.payment_ids.append(payment_id)
+                
+                print_success(f"Initiation téléconsultation réussie - ID: {payment_id}")
+                print_info(f"  Type: {payment_data['consultation_type']}")
+                print_info(f"  Montant: {result.get('amount'):,} {result.get('currency')}")
+                
+                return True
+            else:
+                print_error(f"Échec initiation téléconsultation: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            print_error(f"Erreur initiation téléconsultation: {e}")
+            return False
+    
+    def test_payment_status_check(self):
+        """Test de vérification du statut de paiement"""
+        print_info("=== TEST VÉRIFICATION STATUT PAIEMENT ===")
+        
+        if not self.payment_ids:
+            print_error("Aucun paiement à vérifier")
+            return False
+        
+        success_count = 0
+        
+        for payment_id in self.payment_ids:
+            try:
+                response = self.session.get(f"{self.base_url}/mobile-money/status/{payment_id}")
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    print_success(f"Statut récupéré pour {payment_id}")
+                    print_info(f"  Statut: {result.get('status')}")
+                    print_info(f"  Montant: {result.get('amount'):,} {result.get('currency')}")
+                    print_info(f"  Provider: {result.get('provider')}")
+                    print_info(f"  Créé: {result.get('created_at')}")
+                    
+                    if result.get('completed_at'):
+                        print_info(f"  Complété: {result.get('completed_at')}")
+                    
+                    success_count += 1
+                else:
+                    print_error(f"Échec vérification statut {payment_id}: {response.status_code}")
+                    
+            except Exception as e:
+                print_error(f"Erreur vérification statut {payment_id}: {e}")
+        
+        return success_count > 0
+    
+    def test_payment_confirmation(self):
+        """Test de confirmation manuelle de paiement"""
+        print_info("=== TEST CONFIRMATION MANUELLE PAIEMENT ===")
+        
+        if not self.payment_ids:
+            print_error("Aucun paiement à confirmer")
+            return False
+        
+        # Confirmer le premier paiement
+        payment_id = self.payment_ids[0]
+        
+        try:
+            response = self.session.post(f"{self.base_url}/mobile-money/confirm/{payment_id}")
+            
+            if response.status_code == 200:
+                result = response.json()
+                print_success(f"Confirmation réussie pour {payment_id}")
+                print_info(f"  Message: {result.get('message')}")
+                print_info(f"  Statut paiement: {result.get('payment_status')}")
+                
+                if result.get('appointment_id'):
+                    print_info(f"  Rendez-vous créé: {result.get('appointment_id')}")
+                
+                return True
+            else:
+                print_error(f"Échec confirmation: {response.status_code} - {response.text}")
+                return False
+                
+        except Exception as e:
+            print_error(f"Erreur confirmation: {e}")
+            return False
+    
+    def test_invalid_phone_validation(self):
+        """Test de validation des numéros de téléphone invalides"""
+        print_info("=== TEST VALIDATION NUMÉROS INVALIDES ===")
+        
+        if not self.doctors:
+            print_error("Aucun médecin disponible pour le test")
+            return False
+        
+        doctor = self.doctors[0]
+        invalid_phones = [
+            "123456789",      # Trop court
+            "6771234567890",  # Trop long
+            "577123456",      # Ne commence pas par 6[789]
+            "601234567",      # Mauvais préfixe
+            "abcdefghi"       # Non numérique
+        ]
+        
+        success_count = 0
+        
+        for phone in invalid_phones:
+            payment_data = {
+                "patient_name": "Test Patient",
+                "patient_phone": phone,
+                "doctor_id": doctor["id"],
+                "consultation_type": "cabinet",
+                "appointment_datetime": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M"),
+                "payment_provider": "mtn_momo"
+            }
+            
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/mobile-money/initiate",
+                    json=payment_data,
                     headers={"Content-Type": "application/json"}
                 )
                 
-                # On s'attend à un conflit (409) ou une erreur
-                if response2.status_code == 409:
-                    self.log_test("Double Booking Prevention", True, "Conflit détecté correctement (409)")
-                    return True
-                elif response2.status_code >= 400:
-                    self.log_test("Double Booking Prevention", True, f"Erreur détectée: {response2.status_code}")
-                    return True
+                if response.status_code == 422:  # Validation error expected
+                    print_success(f"Numéro invalide correctement rejeté: {phone}")
+                    success_count += 1
                 else:
-                    self.log_test("Double Booking Prevention", False, "Double réservation autorisée à tort")
-                    return False
-            else:
-                self.log_test("Double Booking Prevention", False, f"Impossible de créer le premier rendez-vous: {response1.status_code}")
-                return False
-                
-        except Exception as e:
-            self.log_test("Double Booking Prevention", False, f"Erreur: {str(e)}")
-            return False
+                    print_error(f"Numéro invalide accepté: {phone} (status: {response.status_code})")
+                    
+            except Exception as e:
+                print_error(f"Erreur test validation {phone}: {e}")
+        
+        return success_count == len(invalid_phones)
     
-    def test_integration_complete(self):
-        """Test PRIORITAIRE: Intégration complète - créer RDV puis vérifier indisponibilité"""
-        if not self.doctor_id:
+    def test_tariff_calculation(self):
+        """Test du calcul des tarifs selon le type de consultation"""
+        print_info("=== TEST CALCUL TARIFS PAR TYPE CONSULTATION ===")
+        
+        if not self.doctors:
+            print_error("Aucun médecin disponible pour le test")
             return False
-            
-        try:
-            test_date = "2024-12-27"
-            test_time = "16:00"  # Changed to a different time slot
-            
-            # 1. Vérifier créneaux disponibles AVANT
-            slots_before = requests.get(f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}")
-            if slots_before.status_code != 200:
-                self.log_test("Integration Complete", False, "Impossible de récupérer les créneaux avant")
-                return False
-                
-            slots_before_data = slots_before.json()
-            slot_before = next((s for s in slots_before_data if s["heure"] == test_time), None)
-            
-            if not slot_before:
-                self.log_test("Integration Complete", False, f"Créneau {test_time} non trouvé")
-                return False
-                
-            was_available = slot_before.get("disponible", False)
-            
-            # 2. Créer un rendez-vous
-            appointment_data = {
-                "doctor_id": self.doctor_id,
-                "patient_name": "Fatima Bello",
-                "patient_age": 35,
-                "date": test_date,
-                "time": test_time,
-                "consultation_type": "cabinet",
-                "price": 15000,
-                "user_id": "test_integration_user"
+        
+        doctor = self.doctors[0]
+        base_tariff = doctor["tarif"]
+        
+        consultation_types = ["cabinet", "domicile", "teleconsultation"]
+        expected_tariffs = {
+            "cabinet": base_tariff,
+            "domicile": base_tariff + 10000,  # +10000 FCFA pour domicile
+            "teleconsultation": base_tariff - 5000  # -5000 FCFA pour téléconsultation
+        }
+        
+        success_count = 0
+        
+        for consultation_type in consultation_types:
+            payment_data = {
+                "patient_name": "Test Tarif",
+                "patient_phone": "677123456",
+                "doctor_id": doctor["id"],
+                "consultation_type": consultation_type,
+                "appointment_datetime": (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d %H:%M"),
+                "payment_provider": "mtn_momo"
             }
             
-            create_response = requests.post(
-                f"{self.base_url}/appointments-simple",
-                json=appointment_data,
-                headers={"Content-Type": "application/json"}
-            )
-            
-            if create_response.status_code != 200:
-                self.log_test("Integration Complete", False, f"Création RDV échouée: {create_response.status_code}")
-                return False
-            
-            # 3. Vérifier créneaux disponibles APRÈS
-            slots_after = requests.get(f"{self.base_url}/doctors/{self.doctor_id}/available-slots?date={test_date}")
-            if slots_after.status_code != 200:
-                self.log_test("Integration Complete", False, "Impossible de récupérer les créneaux après")
-                return False
-                
-            slots_after_data = slots_after.json()
-            slot_after = next((s for s in slots_after_data if s["heure"] == test_time), None)
-            
-            if not slot_after:
-                self.log_test("Integration Complete", False, f"Créneau {test_time} non trouvé après création")
-                return False
-                
-            is_available_after = slot_after.get("disponible", True)
-            
-            # 4. Vérifier que le créneau n'est plus disponible
-            if was_available and not is_available_after:
-                self.log_test(
-                    "Integration Complete", 
-                    True, 
-                    f"✅ Créneau {test_time} était disponible, maintenant indisponible après création RDV"
+            try:
+                response = self.session.post(
+                    f"{self.base_url}/mobile-money/initiate",
+                    json=payment_data,
+                    headers={"Content-Type": "application/json"}
                 )
-                return True
-            elif not was_available:
-                self.log_test(
-                    "Integration Complete", 
-                    True, 
-                    f"ℹ️ Créneau {test_time} était déjà indisponible (test valide)"
-                )
-                return True
-            else:
-                self.log_test(
-                    "Integration Complete", 
-                    False, 
-                    f"❌ Créneau {test_time} toujours disponible après création RDV"
-                )
-                return False
                 
-        except Exception as e:
-            self.log_test("Integration Complete", False, f"Erreur: {str(e)}")
-            return False
+                if response.status_code == 200:
+                    result = response.json()
+                    actual_amount = result.get("amount")
+                    expected_amount = expected_tariffs[consultation_type]
+                    
+                    if actual_amount == expected_amount:
+                        print_success(f"{consultation_type}: {actual_amount:,} FCFA (correct)")
+                        success_count += 1
+                    else:
+                        print_error(f"{consultation_type}: {actual_amount:,} FCFA (attendu: {expected_amount:,})")
+                else:
+                    print_error(f"Échec test tarif {consultation_type}: {response.status_code}")
+                    
+            except Exception as e:
+                print_error(f"Erreur test tarif {consultation_type}: {e}")
+        
+        return success_count == len(consultation_types)
     
     def run_all_tests(self):
-        """Exécuter tous les tests"""
-        print("🏥 DOKTA Backend Tests - Nouvelles Fonctionnalités")
-        print("=" * 60)
-        print()
+        """Exécuter tous les tests Mobile Money"""
+        print_info("🚀 DÉBUT DES TESTS MOBILE MONEY DOKTA")
+        print_info("=" * 50)
         
-        # Tests de base
-        self.test_api_root()
-        self.test_get_doctors()
-        self.test_get_specialties()
-        self.test_search_api()
+        results = []
         
-        # Tests prioritaires des nouvelles fonctionnalités
-        print("🎯 TESTS PRIORITAIRES - NOUVELLES FONCTIONNALITÉS")
-        print("-" * 50)
-        self.test_available_slots()
-        self.test_available_slots_different_dates()
-        self.test_create_appointment_simple()
-        self.test_appointment_validation()
-        self.test_double_booking_prevention()
-        self.test_integration_complete()
+        # Test de connexion
+        results.append(("Connexion API", self.test_api_connection()))
         
-        # Résumé
-        print("📊 RÉSUMÉ DES TESTS")
-        print("=" * 60)
+        # Récupération des médecins
+        results.append(("Récupération médecins", self.get_doctors()))
         
-        passed = sum(1 for result in self.test_results if result["success"])
-        total = len(self.test_results)
+        # Tests d'initiation de paiement
+        results.append(("Initiation MTN Mobile Money", self.test_mtn_payment_initiation()))
+        results.append(("Initiation Orange Money", self.test_orange_payment_initiation()))
+        results.append(("Paiement téléconsultation", self.test_teleconsultation_payment()))
         
-        print(f"Tests réussis: {passed}/{total} ({passed/total*100:.1f}%)")
-        print()
+        # Test de vérification de statut
+        results.append(("Vérification statut", self.test_payment_status_check()))
         
-        # Détails des échecs
-        failed_tests = [result for result in self.test_results if not result["success"]]
-        if failed_tests:
-            print("❌ TESTS ÉCHOUÉS:")
-            for test in failed_tests:
-                print(f"  - {test['test']}: {test['details']}")
+        # Test de confirmation
+        results.append(("Confirmation paiement", self.test_payment_confirmation()))
+        
+        # Tests de validation
+        results.append(("Validation numéros invalides", self.test_invalid_phone_validation()))
+        results.append(("Calcul tarifs", self.test_tariff_calculation()))
+        
+        # Résumé des résultats
+        print_info("\n" + "=" * 50)
+        print_info("📊 RÉSUMÉ DES TESTS")
+        print_info("=" * 50)
+        
+        passed = 0
+        total = len(results)
+        
+        for test_name, result in results:
+            if result:
+                print_success(f"{test_name}")
+                passed += 1
+            else:
+                print_error(f"{test_name}")
+        
+        print_info(f"\n✅ Tests réussis: {passed}/{total} ({passed/total*100:.1f}%)")
+        
+        if passed == total:
+            print_success("🎉 TOUS LES TESTS MOBILE MONEY SONT PASSÉS!")
         else:
-            print("✅ TOUS LES TESTS RÉUSSIS!")
+            print_warning(f"⚠️  {total-passed} test(s) ont échoué")
         
-        return passed, total, failed_tests
+        return passed, total
 
 if __name__ == "__main__":
-    print("Démarrage des tests backend DOKTA...")
-    print(f"URL Backend: {BACKEND_URL}")
-    print()
-    
-    tester = DOKTABackendTester()
-    passed, total, failed = tester.run_all_tests()
+    tester = MobileMoneyTester()
+    passed, total = tester.run_all_tests()
     
     # Code de sortie
-    sys.exit(0 if len(failed) == 0 else 1)
+    exit(0 if passed == total else 1)

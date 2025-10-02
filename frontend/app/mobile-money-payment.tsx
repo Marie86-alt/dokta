@@ -62,6 +62,19 @@ export default function MobileMoneyPayment() {
     price,
   });
 
+  // Vérification si les paramètres sont bien reçus
+  useEffect(() => {
+    if (!doctorName || !patientName || !price) {
+      console.warn('⚠️ Paramètres manquants détectés!');
+      console.log('Paramètres reçus:', Object.keys(params));
+      
+      // Pour les tests, utilisons des valeurs par défaut
+      if (!doctorName) console.log('❌ doctorName manquant');
+      if (!patientName) console.log('❌ patientName manquant');
+      if (!price) console.log('❌ price manquant');
+    }
+  }, [doctorName, patientName, price, params]);
+
   const [selectedMethod, setSelectedMethod] = useState<string>('');
   const [phoneNumber, setPhoneNumber] = useState<string>('');
   const [loading, setLoading] = useState(false);

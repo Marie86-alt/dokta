@@ -409,15 +409,6 @@ export default function MobileMoneyPayment() {
                 </>
               )}
             </TouchableOpacity>
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <>
-                  <Text style={styles.payButtonText}>Payer {price} FCFA</Text>
-                  <Ionicons name="card" size={20} color="white" />
-                </>
-              )}
-            </TouchableOpacity>
 
             {/* Bouton de test temporaire pour forcer la progression */}
             <TouchableOpacity 

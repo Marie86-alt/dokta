@@ -11,7 +11,7 @@ from datetime import datetime, timedelta
 import uuid
 
 # Configuration
-BASE_URL = "https://healthbook-cm.preview.emergentagent.com/api"
+BASE_URL = "https://dokta-app.preview.emergentagent.com/api"
 
 class Colors:
     GREEN = '\033[92m'

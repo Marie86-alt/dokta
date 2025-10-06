@@ -444,6 +444,27 @@ export default function MobileMoneyPayment() {
             </TouchableOpacity>
           </View>
         )}
+
+        {/* Bouton de debug TOUJOURS VISIBLE */}
+        <View style={{ padding: 16, backgroundColor: '#FF5722' }}>
+          <TouchableOpacity 
+            style={{
+              backgroundColor: '#FF5722',
+              padding: 16,
+              borderRadius: 8,
+              alignItems: 'center',
+            }}
+            onPress={() => {
+              console.log('🔧 DEBUG: Bouton debug cliqué!');
+              console.log('🔧 DEBUG: paymentInProgress =', paymentInProgress);
+              Alert.alert('Debug', `paymentInProgress = ${paymentInProgress}`);
+            }}
+          >
+            <Text style={{ color: 'white', fontWeight: 'bold', fontSize: 16 }}>
+              🔧 BOUTON DEBUG (Toujours visible)
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

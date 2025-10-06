@@ -506,8 +506,9 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContainer: {
+    flexGrow: 1,
     padding: 16,
-    paddingBottom: 40, // Espace supplémentaire en bas pour les boutons
+    paddingBottom: 100, // Plus d'espace en bas pour forcer le scroll
   },
   summaryCard: {
     backgroundColor: '#FFFFFF',

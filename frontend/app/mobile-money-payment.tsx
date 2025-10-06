@@ -497,7 +497,10 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
+  },
+  scrollContainer: {
     padding: 16,
+    paddingBottom: 40, // Espace supplémentaire en bas pour les boutons
   },
   summaryCard: {
     backgroundColor: '#FFFFFF',

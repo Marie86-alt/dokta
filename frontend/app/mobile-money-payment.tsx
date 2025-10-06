@@ -317,7 +317,7 @@ export default function MobileMoneyPayment() {
         <Text style={styles.headerTitle}>Paiement Mobile Money</Text>
       </View>
 
-      <View style={styles.content}>
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Résumé de la consultation */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>Résumé de la consultation</Text>

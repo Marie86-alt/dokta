@@ -443,7 +443,7 @@ export default function MobileMoneyPayment() {
             </TouchableOpacity>
           </View>
         )}
-      </View>
+      </ScrollView>
     </SafeAreaView>
   );
 }

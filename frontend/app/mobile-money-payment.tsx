@@ -404,7 +404,7 @@ export default function MobileMoneyPayment() {
 
             {/* Bouton de paiement */}
             <TouchableOpacity 
-              style={styles.payButton}  // Toujours actif pour les tests
+              style={[styles.payButton, { marginTop: 24 }]}  // Toujours actif pour les tests
               onPress={() => {
                 console.log('🎯 Clic bouton Payer - Test DIRECT de changement état');
                 // Changement d'état direct pour test

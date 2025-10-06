@@ -457,8 +457,29 @@ export default function MobileMoneyPayment() {
           </View>
         )}
 
+        {/* Éléments de test pour forcer le scroll */}
+        <View style={{ backgroundColor: '#E3F2FD', padding: 16, marginBottom: 16 }}>
+          <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 8 }}>🧪 Zone de Test de Scroll</Text>
+          <Text>Si vous voyez ceci, c'est que le scroll fonctionne !</Text>
+        </View>
+
+        <View style={{ backgroundColor: '#FFF3E0', padding: 16, marginBottom: 16 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>📏 Élément 1</Text>
+          <Text>Contenu pour augmenter la hauteur de la page</Text>
+        </View>
+
+        <View style={{ backgroundColor: '#F3E5F5', padding: 16, marginBottom: 16 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>📏 Élément 2</Text>
+          <Text>Plus de contenu pour forcer le défilement</Text>
+        </View>
+
+        <View style={{ backgroundColor: '#E8F5E8', padding: 16, marginBottom: 16 }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold', marginBottom: 8 }}>📏 Élément 3</Text>
+          <Text>Encore plus de contenu pour tester le scroll</Text>
+        </View>
+
         {/* Bouton de debug TOUJOURS VISIBLE */}
-        <View style={{ padding: 16, backgroundColor: '#FF5722' }}>
+        <View style={{ padding: 16, backgroundColor: '#FF5722', marginBottom: 20 }}>
           <TouchableOpacity 
             style={{
               backgroundColor: '#FF5722',
@@ -476,6 +497,16 @@ export default function MobileMoneyPayment() {
               🔧 BOUTON DEBUG (Toujours visible)
             </Text>
           </TouchableOpacity>
+        </View>
+
+        {/* Espace final pour test */}
+        <View style={{ height: 200, backgroundColor: '#FFEBEE', justifyContent: 'center', alignItems: 'center' }}>
+          <Text style={{ fontSize: 24, fontWeight: 'bold', color: '#D32F2F' }}>
+            🎯 FIN DE PAGE
+          </Text>
+          <Text style={{ fontSize: 16, color: '#666', marginTop: 8 }}>
+            Si vous voyez ceci, le scroll fonctionne parfaitement !
+          </Text>
         </View>
       </ScrollView>
       </SafeAreaView>

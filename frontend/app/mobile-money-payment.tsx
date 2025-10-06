@@ -318,7 +318,13 @@ export default function MobileMoneyPayment() {
         <Text style={styles.headerTitle}>Paiement Mobile Money</Text>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <ScrollView 
+        style={styles.content} 
+        contentContainerStyle={styles.scrollContainer}
+        showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
+        bounces={true}
+      >
         {/* Résumé de la consultation */}
         <View style={styles.summaryCard}>
           <Text style={styles.summaryTitle}>Résumé de la consultation</Text>

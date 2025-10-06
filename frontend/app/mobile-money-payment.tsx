@@ -638,9 +638,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
+    paddingVertical: 18, // Plus grand pour mobile
+    paddingHorizontal: 16,
     borderRadius: 12,
     gap: 8,
+    minHeight: 56, // Hauteur minimum pour mobile
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   payButtonDisabled: {
     backgroundColor: '#CCC',

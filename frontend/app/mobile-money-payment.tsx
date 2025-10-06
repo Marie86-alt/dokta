@@ -344,7 +344,7 @@ export default function MobileMoneyPayment() {
           </View>
         </View>
 
-        {!paymentInProgress ? (
+        {(console.log('🔍 DEBUG: paymentInProgress =', paymentInProgress), !paymentInProgress) ? (
           <>
             {/* Numéro de téléphone */}
             <View style={styles.phoneSection}>
